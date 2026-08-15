@@ -2,31 +2,39 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Império Contábil | Contabilidade Inteligente</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDK com carregamento otimizado -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
     
     <style>
+        /* ===== RESET E OTIMIZAÇÕES ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-family: 'Segoe UI', Roboto, -apple-system, system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        /* ===== MELHORIAS DE PERFORMANCE ===== */
         body {
             background: linear-gradient(135deg, #0b3b5c 0%, #1a5276 50%, #2c3e50 100%);
             min-height: 100vh;
+            min-height: 100dvh; /* Dynamic viewport height para mobile */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
+        /* ===== NAVBAR ===== */
         .navbar {
             background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(10px);
-            padding: 1.2rem 2rem;
+            -webkit-backdrop-filter: blur(10px);
+            padding: 0.8rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,26 +42,27 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            min-height: 70px;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
         }
 
         .logo-icon {
-            width: 120px;
-            height: 120px;
-            border-radius: 0;
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: visible;
             background: transparent;
-            box-shadow: none;
-            border: none;
-            padding: 0;
         }
 
         .logo-icon img {
@@ -64,233 +73,252 @@
         }
 
         .logo-text h1 {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #0b3b5c;
             line-height: 1.2;
+            white-space: nowrap;
         }
 
         .logo-text span {
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             color: #5a7d9a;
             font-weight: 500;
+            display: block;
         }
 
         .btn-area-cliente {
             background: linear-gradient(135deg, #0b3b5c, #1a5276);
             color: white;
-            padding: 0.75rem 1.8rem;
+            padding: 0.5rem 1rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(11,59,92,0.3);
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .btn-area-cliente:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(11,59,92,0.4);
+        .btn-area-cliente:active {
+            transform: scale(0.95);
         }
 
+        /* ===== HERO ===== */
         .hero {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 3rem 2rem;
+            padding: 1.5rem 1rem 2rem;
         }
 
         .hero-title {
             text-align: center;
             color: white;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .hero-title h2 {
-            font-size: 2.8rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            line-height: 1.2;
         }
 
         .hero-title p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             opacity: 0.9;
             font-weight: 300;
         }
 
         .mvv-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.8rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .card-mvv {
             background: white;
-            padding: 2.2rem;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-            transition: all 0.3s;
-            border-top: 5px solid #0b3b5c;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            transition: transform 0.2s;
+            border-top: 4px solid #0b3b5c;
         }
 
-        .card-mvv:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        .card-mvv:active {
+            transform: scale(0.98);
         }
 
         .card-mvv .icon-circle {
-            width: 55px;
-            height: 55px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: linear-gradient(135deg, #0b3b5c, #1a5276);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            flex-shrink: 0;
         }
 
         .card-mvv h3 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #0b3b5c;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
         }
 
         .card-mvv p {
             color: #5a6f7e;
-            line-height: 1.7;
-            font-size: 0.95rem;
+            line-height: 1.6;
+            font-size: 0.9rem;
         }
 
         .contact-section {
             text-align: center;
-            padding: 2rem 0;
+            padding: 1rem 0;
         }
 
         .contact-section h3 {
             color: white;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
         }
 
         .social-buttons {
             display: flex;
-            gap: 1.2rem;
+            gap: 0.8rem;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .btn-social {
-            padding: 0.9rem 2rem;
+            padding: 0.7rem 1.5rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
+            gap: 8px;
+            transition: all 0.2s;
             color: white;
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-social:active {
+            transform: scale(0.95);
         }
 
         .btn-whatsapp {
             background: #25D366;
-            box-shadow: 0 5px 15px rgba(37,211,102,0.4);
+            box-shadow: 0 4px 12px rgba(37,211,102,0.3);
         }
 
         .btn-instagram {
             background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            box-shadow: 0 5px 15px rgba(220,39,67,0.4);
-        }
-
-        .btn-social:hover {
-            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(220,39,67,0.3);
         }
 
         .btn-admin-link {
             display: block;
             text-align: center;
-            margin-top: 2rem;
-            color: rgba(255,255,255,0.7);
+            margin-top: 1.5rem;
+            color: rgba(255,255,255,0.6);
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: 0.3s;
+            padding: 0.5rem;
         }
 
-        .btn-admin-link:hover {
+        .btn-admin-link:active {
             color: white;
         }
 
-        .hidden {
-            display: none !important;
-        }
-
+        /* ===== MODAL LOGIN ===== */
         .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-box {
             background: white;
-            border-radius: 24px;
-            padding: 2.8rem;
-            width: 90%;
-            max-width: 440px;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 400px;
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .login-box .close-btn {
             position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 1.5rem;
+            top: 12px;
+            right: 16px;
+            font-size: 1.4rem;
             cursor: pointer;
             color: #95a5a6;
             background: none;
             border: none;
+            padding: 0.5rem;
+            line-height: 1;
         }
 
         .login-box h2 {
             text-align: center;
             color: #0b3b5c;
-            margin-bottom: 0.5rem;
-            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+            font-size: 1.4rem;
         }
 
         .login-box .subtitle {
             text-align: center;
             color: #7f8c8d;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
             font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
         }
 
         .input-wrapper {
@@ -303,82 +331,123 @@
             top: 50%;
             transform: translateY(-50%);
             color: #95a5a6;
+            font-size: 0.9rem;
         }
 
         .input-wrapper input {
             width: 100%;
-            padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+            padding: 0.7rem 0.7rem 0.7rem 2.6rem;
             border: 2px solid #e0e6ed;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: 0.3s;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #fafafa;
         }
 
         .input-wrapper input:focus {
             outline: none;
             border-color: #0b3b5c;
+            background: white;
         }
 
         .btn-login-submit {
             width: 100%;
-            padding: 0.9rem;
+            padding: 0.8rem;
             background: linear-gradient(135deg, #0b3b5c, #1a5276);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.05rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 0.8rem;
-            transition: 0.3s;
+            margin-top: 0.5rem;
+            transition: 0.2s;
         }
 
-        .btn-login-submit:hover {
-            background: linear-gradient(135deg, #0d4a72, #1e5f85);
+        .btn-login-submit:active {
+            transform: scale(0.97);
         }
 
         .error-msg {
             background: #ffe0e0;
             color: #c0392b;
-            padding: 0.8rem;
+            padding: 0.6rem;
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             display: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
+        /* ===== PAINEL ADMIN ===== */
         .admin-panel {
             background: #f0f4f8;
             min-height: 100vh;
+            min-height: 100dvh;
         }
 
         .admin-header {
             background: #0b1e2f;
             color: white;
-            padding: 1.2rem 2rem;
+            padding: 0.8rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .admin-header h2 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-header .top-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
+        }
+
+        .admin-header .actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-header .actions button {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
         }
 
         .admin-tabs {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.3rem;
             flex-wrap: wrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.2rem;
         }
 
         .admin-tab {
-            padding: 0.5rem 1rem;
+            padding: 0.35rem 0.7rem;
             border-radius: 20px;
             cursor: pointer;
             border: 2px solid rgba(255,255,255,0.3);
             color: white;
             background: transparent;
             font-weight: 500;
-            transition: 0.3s;
-            font-size: 0.85rem;
+            transition: 0.2s;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .admin-tab:active {
+            transform: scale(0.95);
         }
 
         .admin-tab.active {
@@ -389,191 +458,230 @@
 
         .admin-content {
             max-width: 1100px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 1rem auto;
+            padding: 0 0.8rem;
+        }
+
+        /* ===== CARDS ===== */
+        .nf-card, .doc-card, .vencimento-card, .dashboard-card, .placar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
         .nf-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-            border-left: 5px solid #f39c12;
+            border-left: 4px solid #f39c12;
         }
 
         .nf-card.emitida {
             border-left-color: #27ae60;
         }
 
+        /* ===== BADGES ===== */
         .badge {
             display: inline-block;
-            padding: 0.3rem 0.8rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
         }
 
-        .badge-pendente {
-            background: #fef3cd;
-            color: #856404;
-        }
+        .badge-pendente { background: #fef3cd; color: #856404; }
+        .badge-concluido { background: #d4edda; color: #155724; }
+        .badge-andamento { background: #cce5ff; color: #004085; }
+        .badge-emitida { background: #d4edda; color: #155724; }
+        .badge-novo { background: #e74c3c; color: white; }
+        .badge-verde { background: #d4edda; color: #155724; }
+        .badge-amarelo { background: #fef3cd; color: #856404; }
+        .badge-vermelho { background: #f8d7da; color: #721c24; }
+        .badge-cinza { background: #e0e0e0; color: #333; }
 
-        .badge-concluido {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-andamento {
-            background: #cce5ff;
-            color: #004085;
-        }
-
-        .badge-emitida {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-novo {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .badge-verde {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-amarelo {
-            background: #fef3cd;
-            color: #856404;
-        }
-
-        .badge-vermelho {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-cinza {
-            background: #e0e0e0;
-            color: #333;
-        }
-
+        /* ===== BOTÕES ===== */
         .btn-emitir, .btn-status {
             background: #27ae60;
             color: white;
             border: none;
-            padding: 0.5rem 1.2rem;
+            padding: 0.3rem 0.8rem;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            margin-top: 0.5rem;
-            margin-right: 0.3rem;
+            margin-top: 0.3rem;
+            margin-right: 0.2rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-emitir:active, .btn-status:active {
+            transform: scale(0.95);
         }
 
         .btn-excluir {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 0.4rem 0.8rem;
+            padding: 0.3rem 0.6rem;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-excluir:active {
+            transform: scale(0.95);
         }
 
         .btn-backup {
             background: #f39c12;
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-backup:active {
+            transform: scale(0.95);
         }
 
         .btn-upload {
             background: #3498db;
             color: white;
             border: none;
-            padding: 0.8rem 1.5rem;
+            padding: 0.6rem 1rem;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: #0b1e2f;
-            color: white;
-            padding: 0.8rem;
-            text-align: left;
-        }
-
-        td {
-            padding: 0.8rem;
-            border-bottom: 1px solid #ecf0f1;
-            vertical-align: top;
-        }
-
-        .input-small {
-            width: 100%;
-            padding: 0.4rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            margin-top: 0.3rem;
             font-size: 0.85rem;
+            width: 100%;
+            transition: 0.2s;
         }
 
-        .input-obs {
-            width: 100%;
-            padding: 0.4rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            resize: vertical;
+        .btn-upload:active {
+            transform: scale(0.97);
         }
 
         .btn-salvar {
             background: #3498db;
             color: white;
             border: none;
-            padding: 0.4rem 0.8rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-salvar:active {
+            transform: scale(0.95);
+        }
+
+        .btn-solicitar {
+            background: #0b3b5c;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-solicitar:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== TABELAS RESPONSIVAS ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             font-size: 0.8rem;
         }
 
+        th {
+            background: #0b1e2f;
+            color: white;
+            padding: 0.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+        }
+
+        td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: middle;
+        }
+
+        .input-small {
+            width: 100%;
+            padding: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .input-obs {
+            width: 100%;
+            padding: 0.3rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 30px;
+        }
+
+        /* ===== SELECTS E INPUTS ===== */
+        textarea, select, input[type="text"], input[type="number"], input[type="date"], input[type="month"], input[type="url"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            margin: 0.2rem 0 0.6rem;
+            font-size: 0.9rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: #0b3b5c;
+        }
+
+        /* ===== DOCUMENTOS ===== */
         .documento-link {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.8rem;
+            padding: 0.6rem;
             background: #f8f9fa;
             border-radius: 8px;
-            margin: 0.5rem 0;
+            margin: 0.3rem 0;
             text-decoration: none;
             color: #2c3e50;
-            transition: 0.3s;
+            transition: 0.2s;
+            font-size: 0.85rem;
         }
 
-        .documento-link:hover {
+        .documento-link:active {
             background: #e8f4fd;
         }
 
         .documento-link i {
             color: #e74c3c;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .documento-novo {
@@ -581,93 +689,166 @@
             border: 2px solid #f39c12;
         }
 
-        .placar-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        /* ===== ATIVIDADES ===== */
+        .atividade-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #3498db;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
         }
 
-        .placar-grid {
+        .atividade-item .info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .atividade-item .info strong {
+            display: block;
+            font-size: 0.9rem;
+            color: #0b3b5c;
+        }
+
+        .atividade-item .info small {
+            color: #5a6f7e;
+            font-size: 0.75rem;
+        }
+
+        .atividade-item .acoes {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .atividade-item .acoes textarea {
+            width: auto;
+            min-width: 100px;
+            max-width: 200px;
+            margin: 0;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .atividade-item .acoes input[type="date"] {
+            width: auto;
+            max-width: 130px;
+            margin: 0;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* ===== SALDO GRID ===== */
+        .saldo-grid, .placar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.6rem;
+            margin-bottom: 1rem;
         }
 
-        .placar-item {
-            background: #f0f4f8;
-            padding: 1rem;
+        .saldo-item, .placar-item {
+            background: #eaf2f8;
+            padding: 0.8rem;
             border-radius: 10px;
             text-align: center;
         }
 
-        .placar-item .label {
-            font-size: 0.8rem;
-            color: #7f8c8d;
+        .saldo-item .rotulo, .placar-item .label {
+            font-size: 0.7rem;
+            color: #5a6f7e;
         }
 
-        .placar-item .valor {
-            font-size: 1.3rem;
+        .saldo-item .valor, .placar-item .valor {
+            font-size: 1.1rem;
             font-weight: 700;
             color: #0b3b5c;
         }
 
         .fator-r-badge {
             display: inline-block;
-            padding: 0.5rem 1.5rem;
+            padding: 0.3rem 1rem;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
 
-        .fator-r-ok {
-            background: #d4edda;
-            color: #155724;
-        }
+        .fator-r-ok { background: #d4edda; color: #155724; }
+        .fator-r-alerta { background: #fef3cd; color: #856404; }
+        .fator-r-ruim { background: #f8d7da; color: #721c24; }
 
-        .fator-r-alerta {
-            background: #fef3cd;
-            color: #856404;
-        }
-
-        .fator-r-ruim {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
+        /* ===== CLIENTE PANEL ===== */
         .cliente-panel {
             background: #f0f4f8;
             min-height: 100vh;
+            min-height: 100dvh;
         }
 
         .cliente-header {
             background: #0b1e2f;
             color: white;
-            padding: 1.2rem 2rem;
+            padding: 0.8rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .cliente-header .top-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
+        }
+
+        .cliente-header h2 {
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cliente-header h2 span {
+            font-size: 0.9rem;
+            font-weight: 400;
         }
 
         .cliente-tabs {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.3rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.2rem;
         }
 
         .cliente-tab {
-            padding: 0.5rem 1rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 20px;
             cursor: pointer;
             border: 2px solid rgba(255,255,255,0.3);
             color: white;
             background: transparent;
             font-weight: 500;
-            transition: 0.3s;
-            font-size: 0.85rem;
+            transition: 0.2s;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .cliente-tab:active {
+            transform: scale(0.95);
         }
 
         .cliente-tab.active {
@@ -678,189 +859,181 @@
 
         .cliente-content {
             max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 1rem auto;
+            padding: 0 0.8rem;
         }
 
-        .dashboard-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.8rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-        }
-
-        .saldo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .saldo-item {
-            background: #eaf2f8;
-            padding: 1.2rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .saldo-item .valor {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0b3b5c;
-        }
-
-        .saldo-item .rotulo {
-            font-size: 0.8rem;
-            color: #5a6f7e;
-        }
-
-        .btn-solicitar {
-            background: #0b3b5c;
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 0.8rem;
-        }
-
-        .vencimento-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 5px solid #27ae60;
-        }
-
-        .vencimento-card.alerta {
-            border-left-color: #f39c12;
-        }
-
-        .vencimento-card.critico {
-            border-left-color: #e74c3c;
-        }
-
-        .vencimento-card.vencido {
-            border-left-color: #333;
-            opacity: 0.7;
-        }
-
-        .doc-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        textarea, select, input {
-            width: 100%;
-            padding: 0.7rem;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            margin: 0.4rem 0 0.8rem;
-            font-size: 0.95rem;
-        }
-
+        /* ===== LOADING ===== */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.9);
+            height: 100dvh;
+            background: rgba(255,255,255,0.92);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            font-size: 1.5rem;
-            color: #0b3b5c;
-        }
-
-        .info-box {
-            background: #e8f4fd;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: #0b3b5c;
-        }
-
-        /* Estilo para a lista de atividades sem status */
-        .atividade-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.5rem;
-            border-left: 4px solid #3498db;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .atividade-item .info {
-            flex: 1;
-            min-width: 200px;
-        }
-        .atividade-item .info strong {
-            display: block;
             font-size: 1rem;
             color: #0b3b5c;
         }
-        .atividade-item .info small {
-            color: #5a6f7e;
-        }
-        .atividade-item .acoes {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .atividade-item .acoes textarea,
-        .atividade-item .acoes input {
-            width: auto;
-            margin: 0;
-            padding: 0.3rem 0.6rem;
-            font-size: 0.85rem;
-        }
-        .atividade-item .acoes textarea {
-            min-width: 150px;
-            max-width: 250px;
-        }
-        .atividade-item .acoes .btn-salvar {
-            padding: 0.3rem 0.8rem;
+
+        .loading-overlay .spinner {
+            text-align: center;
         }
 
-        @media (max-width: 600px) {
-            .saldo-grid, .placar-grid {
-                grid-template-columns: 1fr;
+        .loading-overlay .spinner i {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        /* ===== INFO BOX ===== */
+        .info-box {
+            background: #e8f4fd;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            color: #0b3b5c;
+        }
+
+        /* ===== HIDDEN ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 0.5rem 0.8rem;
+                min-height: 60px;
             }
-            .hero-title h2 {
-                font-size: 2rem;
-            }
+            
             .logo-icon {
-                width: 80px;
-                height: 80px;
+                width: 40px;
+                height: 40px;
             }
+            
             .logo-text h1 {
+                font-size: 1rem;
+            }
+            
+            .logo-text span {
+                font-size: 0.6rem;
+            }
+            
+            .btn-area-cliente {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.7rem;
+            }
+            
+            .hero-title h2 {
                 font-size: 1.4rem;
             }
+            
+            .hero-title p {
+                font-size: 0.85rem;
+            }
+            
+            .card-mvv {
+                padding: 1rem;
+            }
+            
+            .card-mvv h3 {
+                font-size: 1rem;
+            }
+            
+            .card-mvv p {
+                font-size: 0.8rem;
+            }
+            
+            .login-box {
+                padding: 1.5rem 1rem;
+            }
+            
+            .admin-header h2 {
+                font-size: 0.95rem;
+            }
+            
+            .admin-tab, .cliente-tab {
+                font-size: 0.65rem;
+                padding: 0.25rem 0.6rem;
+            }
+            
+            table {
+                font-size: 0.7rem;
+            }
+            
+            th, td {
+                padding: 0.3rem;
+            }
+            
+            .input-small, .input-obs {
+                font-size: 0.7rem;
+            }
+            
             .atividade-item {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 0.6rem;
             }
+            
             .atividade-item .acoes {
-                margin-top: 0.5rem;
                 flex-direction: column;
                 align-items: stretch;
             }
+            
             .atividade-item .acoes textarea {
                 max-width: 100%;
                 min-width: 100%;
+            }
+            
+            .atividade-item .acoes input[type="date"] {
+                max-width: 100%;
+            }
+            
+            .saldo-grid, .placar-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .btn-social {
+                font-size: 0.75rem;
+                padding: 0.5rem 1rem;
+                min-width: 100px;
+            }
+            
+            .documento-link {
+                font-size: 0.75rem;
+                padding: 0.5rem;
+            }
+            
+            .nf-card {
+                padding: 0.8rem;
+            }
+            
+            .nf-card h4 {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .saldo-grid, .placar-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-text h1 {
+                font-size: 0.85rem;
+            }
+            
+            .admin-header .top-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .admin-header .actions {
+                justify-content: center;
             }
         }
     </style>
@@ -868,9 +1041,9 @@
 <body>
 
 <div id="loadingOverlay" class="loading-overlay">
-    <div style="text-align:center;">
-        <i class="fas fa-spinner fa-spin" style="font-size:3rem;"></i>
-        <p style="margin-top:1rem;">Conectando ao servidor...</p>
+    <div class="spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Conectando ao servidor...</p>
     </div>
 </div>
 
@@ -885,7 +1058,7 @@
             </div>
         </div>
         <button class="btn-area-cliente" onclick="abrirLogin('cliente')">
-            <i class="fas fa-lock"></i> Área do Cliente
+            <i class="fas fa-lock"></i> <span>Área do Cliente</span>
         </button>
     </nav>
 
@@ -915,7 +1088,7 @@
             <h3>Fale Conosco</h3>
             <div class="social-buttons">
                 <a href="https://wa.me/5511999999999" class="btn-social btn-whatsapp" target="_blank">
-                    <i class="fab fa-whatsapp"></i> WhatsApp Business
+                    <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
                 <a href="https://instagram.com/imperiocontabil" class="btn-social btn-instagram" target="_blank">
                     <i class="fab fa-instagram"></i> Instagram
@@ -940,7 +1113,7 @@
                 <label>CPF ou CNPJ</label>
                 <div class="input-wrapper">
                     <i class="fas fa-id-card"></i>
-                    <input type="text" id="inputDocumento" placeholder="Apenas números" required>
+                    <input type="text" id="inputDocumento" placeholder="Apenas números" required inputmode="numeric">
                 </div>
             </div>
             <div class="form-group">
@@ -958,31 +1131,33 @@
 <!-- ==================== PAINEL ADMIN ==================== -->
 <div id="painelAdmin" class="admin-panel hidden">
     <div class="admin-header">
-        <h2><i class="fas fa-crown"></i> Painel Administrativo</h2>
+        <div class="top-row">
+            <h2><i class="fas fa-crown"></i> Painel Administrativo</h2>
+            <div class="actions">
+                <button class="btn-backup" onclick="exportarBackup()"><i class="fas fa-download"></i></button>
+                <button class="btn-backup" onclick="document.getElementById('inputImportar').click()"><i class="fas fa-upload"></i></button>
+                <input type="file" id="inputImportar" accept=".json" style="display:none;" onchange="importarBackup(event)">
+                <button class="btn-area-cliente" style="background:#c0392b; padding:0.3rem 0.8rem; font-size:0.75rem;" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="alternarTabAdmin('nfs')">📋 NF</button>
             <button class="admin-tab" onclick="alternarTabAdmin('clientes')">👥 Clientes</button>
             <button class="admin-tab" onclick="alternarTabAdmin('atividades')">📝 Atividades</button>
             <button class="admin-tab" onclick="alternarTabAdmin('documentos')">📁 Docs</button>
-            <button class="admin-tab" onclick="alternarTabAdmin('gerenciarDocs')">🗂️ Gerir Docs</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('gerenciarDocs')">🗂️ Gerir</button>
             <button class="admin-tab" onclick="alternarTabAdmin('agenda')">📅 Agenda</button>
             <button class="admin-tab" onclick="alternarTabAdmin('fatorR')">📊 Fator R</button>
-        </div>
-        <div style="display:flex; gap:0.5rem;">
-            <button class="btn-backup" onclick="exportarBackup()">📥</button>
-            <button class="btn-backup" onclick="document.getElementById('inputImportar').click()">📤</button>
-            <input type="file" id="inputImportar" accept=".json" style="display:none;" onchange="importarBackup(event)">
-            <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </button>
         </div>
     </div>
     <div class="admin-content">
         <div id="tabNFs">
-            <h3 style="margin-bottom:1rem;">📋 Todas as Notas Fiscais</h3>
-            <div style="margin-bottom:1rem;">
-                <label style="font-weight:600;">Filtrar por cliente:</label>
-                <select id="filtroClienteNF" onchange="carregarTodasNFs()" style="width:auto; min-width:250px;">
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">📋 Todas as Notas Fiscais</h3>
+            <div style="margin-bottom:0.8rem;">
+                <label style="font-weight:600; font-size:0.85rem;">Filtrar por cliente:</label>
+                <select id="filtroClienteNF" onchange="carregarTodasNFs()" style="width:auto; min-width:200px; max-width:100%;">
                     <option value="">Todos os clientes</option>
                 </select>
             </div>
@@ -990,34 +1165,34 @@
         </div>
         
         <div id="tabClientes" class="hidden">
-            <h3 style="margin-bottom:1rem;">👥 Gerenciar Clientes</h3>
-            <div style="background:white; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
-                <h4 style="margin-bottom:1rem;">➕ Novo Cliente</h4>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div><label style="font-weight:600;">CPF/CNPJ</label><input type="text" id="novoDoc" class="input-small"></div>
-                    <div><label style="font-weight:600;">Nome</label><input type="text" id="novoNome" class="input-small"></div>
-                    <div><label style="font-weight:600;">Senha</label><input type="text" id="novaSenha" class="input-small"></div>
-                    <div><label style="font-weight:600;">Receitas (R$)</label><input type="number" id="novaReceita" value="0" step="0.01" class="input-small"></div>
-                    <div><label style="font-weight:600;">Despesas (R$)</label><input type="number" id="novaDespesa" value="0" step="0.01" class="input-small"></div>
-                    <div style="display:flex; align-items:end;"><button class="btn-salvar" onclick="adicionarCliente()" style="width:100%; padding:0.6rem;">✅ Cadastrar</button></div>
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">👥 Gerenciar Clientes</h3>
+            <div style="background:white; border-radius:12px; padding:1rem; margin-bottom:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <h4 style="margin-bottom:0.8rem; font-size:1rem;">➕ Novo Cliente</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                    <div><label style="font-weight:600; font-size:0.8rem;">CPF/CNPJ</label><input type="text" id="novoDoc" class="input-small" inputmode="numeric"></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Nome</label><input type="text" id="novoNome" class="input-small"></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Senha</label><input type="text" id="novaSenha" class="input-small"></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Receitas (R$)</label><input type="number" id="novaReceita" value="0" step="0.01" class="input-small"></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Despesas (R$)</label><input type="number" id="novaDespesa" value="0" step="0.01" class="input-small"></div>
+                    <div style="display:flex; align-items:end;"><button class="btn-salvar" onclick="adicionarCliente()" style="width:100%; padding:0.4rem;">✅ Cadastrar</button></div>
                 </div>
             </div>
-            <h4 style="margin-bottom:0.5rem;">📋 Clientes</h4>
-            <div id="tabelaClientes"></div>
+            <h4 style="margin-bottom:0.5rem; font-size:1rem;">📋 Clientes</h4>
+            <div id="tabelaClientes" style="overflow-x:auto; -webkit-overflow-scrolling:touch;"></div>
         </div>
         
         <div id="tabAtividades" class="hidden">
-            <h3 style="margin-bottom:1rem;">📝 Controle de Atividades</h3>
-            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
-                <label style="font-weight:600;">Cliente</label>
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">📝 Controle de Atividades</h3>
+            <div style="background:white; border-radius:12px; padding:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <label style="font-weight:600; font-size:0.85rem;">Cliente</label>
                 <select id="selectClienteAtividade" onchange="carregarAtividades()"><option value="">Escolha...</option></select>
-                <div id="tabelaAtividades"><p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p></div>
+                <div id="tabelaAtividades" style="margin-top:0.8rem;"><p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p></div>
             </div>
         </div>
         
         <div id="tabDocumentos" class="hidden">
-            <h3 style="margin-bottom:1rem;">📁 Adicionar Documento (Google Drive)</h3>
-            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">📁 Adicionar Documento</h3>
+            <div style="background:white; border-radius:12px; padding:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <div class="info-box">
                     <strong>📌 Como fazer:</strong><br>
                     1. Suba o PDF no <a href="https://drive.google.com" target="_blank" style="color:#1a5276;">Google Drive</a><br>
@@ -1025,19 +1200,19 @@
                     3. Mude para <strong>"Qualquer pessoa com o link"</strong><br>
                     4. Copie o link e cole abaixo
                 </div>
-                <div class="form-group"><label>Cliente</label><select id="selectClienteDoc"><option value="">Escolha...</option></select></div>
-                <div class="form-group"><label>Tipo</label><select id="tipoDocumento"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option><option value="extrato">Extrato</option><option value="outro">Outro</option></select></div>
-                <div class="form-group"><label>Nome</label><input type="text" id="nomeDocumento" placeholder="Ex: DAS - Competência 08/2024"></div>
-                <div class="form-group"><label>Link Google Drive</label><input type="url" id="linkDocumento" placeholder="https://drive.google.com/file/d/..."></div>
-                <button class="btn-upload" onclick="adicionarDocumentoDrive()" style="width:100%;">📤 Adicionar Documento</button>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Cliente</label><select id="selectClienteDoc"><option value="">Escolha...</option></select></div>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Tipo</label><select id="tipoDocumento"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option><option value="extrato">Extrato</option><option value="outro">Outro</option></select></div>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Nome</label><input type="text" id="nomeDocumento" placeholder="Ex: DAS - Competência 08/2024"></div>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Link Google Drive</label><input type="url" id="linkDocumento" placeholder="https://drive.google.com/file/d/..."></div>
+                <button class="btn-upload" onclick="adicionarDocumentoDrive()">📤 Adicionar Documento</button>
             </div>
         </div>
 
         <div id="tabGerenciarDocs" class="hidden">
-            <h3 style="margin-bottom:1rem;">🗂️ Gerenciar Documentos</h3>
-            <div style="margin-bottom:1rem;">
-                <label style="font-weight:600;">Filtrar por cliente:</label>
-                <select id="filtroClienteDocs" onchange="carregarGerenciamentoDocs()" style="width:auto; min-width:250px;">
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">🗂️ Gerenciar Documentos</h3>
+            <div style="margin-bottom:0.8rem;">
+                <label style="font-weight:600; font-size:0.85rem;">Filtrar por cliente:</label>
+                <select id="filtroClienteDocs" onchange="carregarGerenciamentoDocs()" style="width:auto; min-width:200px; max-width:100%;">
                     <option value="">Todos os clientes</option>
                 </select>
             </div>
@@ -1045,25 +1220,25 @@
         </div>
 
         <div id="tabAgenda" class="hidden">
-            <h3 style="margin-bottom:1rem;">📅 Agenda de Obrigações Fiscais</h3>
-            <div style="background:white; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
-                <h4 style="margin-bottom:1rem;">➕ Adicionar Vencimento</h4>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
-                    <div><label style="font-weight:600;">Cliente</label><select id="selectClienteVencimento"><option value="">Escolha...</option></select></div>
-                    <div><label style="font-weight:600;">Obrigação</label><select id="tipoObrigacao"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option></select></div>
-                    <div><label style="font-weight:600;">Competência</label><input type="month" id="competenciaObrigacao"></div>
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">📅 Agenda de Obrigações Fiscais</h3>
+            <div style="background:white; border-radius:12px; padding:1rem; margin-bottom:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <h4 style="margin-bottom:0.8rem; font-size:1rem;">➕ Adicionar Vencimento</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem;">
+                    <div><label style="font-weight:600; font-size:0.8rem;">Cliente</label><select id="selectClienteVencimento"><option value="">Escolha...</option></select></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Obrigação</label><select id="tipoObrigacao"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option></select></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Competência</label><input type="month" id="competenciaObrigacao"></div>
                 </div>
-                <button class="btn-upload" onclick="adicionarVencimento()" style="width:100%; margin-top:1rem;">➕ Adicionar Vencimento</button>
+                <button class="btn-upload" onclick="adicionarVencimento()" style="margin-top:0.6rem;">➕ Adicionar Vencimento</button>
             </div>
             <div id="listaVencimentosAdmin"></div>
         </div>
         
         <div id="tabFatorR" class="hidden">
-            <h3 style="margin-bottom:1rem;">📊 Placar Fator R</h3>
-            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
-                <label style="font-weight:600;">Cliente</label>
+            <h3 style="margin-bottom:0.8rem; font-size:1.1rem;">📊 Placar Fator R</h3>
+            <div style="background:white; border-radius:12px; padding:1rem; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <label style="font-weight:600; font-size:0.85rem;">Cliente</label>
                 <select id="selectClienteFatorR" onchange="carregarFatorR()"><option value="">Escolha...</option></select>
-                <div id="placarFatorR"><p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p></div>
+                <div id="placarFatorR" style="margin-top:0.8rem;"><p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p></div>
             </div>
         </div>
     </div>
@@ -1072,20 +1247,22 @@
 <!-- ==================== PAINEL CLIENTE ==================== -->
 <div id="painelCliente" class="cliente-panel hidden">
     <div class="cliente-header">
-        <h2><i class="fas fa-user"></i> <span id="nomeClienteHeader"></span></h2>
+        <div class="top-row">
+            <h2><i class="fas fa-user"></i> <span id="nomeClienteHeader"></span></h2>
+            <button class="btn-area-cliente" style="background:#c0392b; padding:0.3rem 0.8rem; font-size:0.75rem;" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
         <div class="cliente-tabs">
             <button class="cliente-tab active" onclick="alternarTabCliente('dashboard')">📊 Dashboard</button>
-            <button class="cliente-tab" onclick="alternarTabCliente('notas')">📝 Notas Fiscais</button>
+            <button class="cliente-tab" onclick="alternarTabCliente('notas')">📝 Notas</button>
             <button class="cliente-tab" onclick="alternarTabCliente('agenda')">📅 Vencimentos</button>
         </div>
-        <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> Sair
-        </button>
     </div>
     <div class="cliente-content">
         <div id="tabClienteDashboard">
             <div class="dashboard-card">
-                <h3>📊 Dashboard Financeiro</h3>
+                <h3 style="font-size:1rem; margin-bottom:0.8rem;">📊 Dashboard Financeiro</h3>
                 <div class="saldo-grid">
                     <div class="saldo-item"><div class="rotulo">Receitas</div><div class="valor" id="recCliente">R$ 0,00</div></div>
                     <div class="saldo-item"><div class="rotulo">Despesas</div><div class="valor" id="despCliente">R$ 0,00</div></div>
@@ -1093,33 +1270,39 @@
                 </div>
             </div>
             <div class="dashboard-card">
-                <h3>📁 Meus Documentos</h3>
+                <h3 style="font-size:1rem; margin-bottom:0.8rem;">📁 Meus Documentos</h3>
                 <div id="documentosCliente"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhum documento.</p></div>
             </div>
         </div>
 
         <div id="tabClienteNotas" class="hidden">
             <div class="dashboard-card">
-                <h3>📝 Solicitar Emissão de Nota Fiscal</h3>
+                <h3 style="font-size:1rem; margin-bottom:0.8rem;">📝 Solicitar Emissão de Nota Fiscal</h3>
                 <form id="formSolicitarNF" onsubmit="solicitarNF(event)">
-                    <label>Valor (R$)</label><input type="number" id="nfValor" step="0.01" required>
-                    <label>Produto/Serviço</label><input type="text" id="nfProduto" required>
-                    <label>Pagamento</label><select id="nfPagamento"><option>PIX</option><option>Boleto</option><option>Cartão</option></select>
-                    <label>Nome do Tomador</label><input type="text" id="nfNomeTomador" required>
-                    <label>CPF/CNPJ do Tomador</label><input type="text" id="nfDocTomador" required>
-                    <label>Endereço</label><input type="text" id="nfEndereco" required>
+                    <label style="font-size:0.85rem; font-weight:600;">Valor (R$)</label>
+                    <input type="number" id="nfValor" step="0.01" required>
+                    <label style="font-size:0.85rem; font-weight:600;">Produto/Serviço</label>
+                    <input type="text" id="nfProduto" required>
+                    <label style="font-size:0.85rem; font-weight:600;">Pagamento</label>
+                    <select id="nfPagamento"><option>PIX</option><option>Boleto</option><option>Cartão</option></select>
+                    <label style="font-size:0.85rem; font-weight:600;">Nome do Tomador</label>
+                    <input type="text" id="nfNomeTomador" required>
+                    <label style="font-size:0.85rem; font-weight:600;">CPF/CNPJ do Tomador</label>
+                    <input type="text" id="nfDocTomador" required inputmode="numeric">
+                    <label style="font-size:0.85rem; font-weight:600;">Endereço</label>
+                    <input type="text" id="nfEndereco" required>
                     <button type="submit" class="btn-solicitar"><i class="fas fa-paper-plane"></i> Solicitar NF</button>
                 </form>
             </div>
             <div class="dashboard-card">
-                <h3>📋 Minhas Notas Fiscais</h3>
+                <h3 style="font-size:1rem; margin-bottom:0.8rem;">📋 Minhas Notas Fiscais</h3>
                 <div id="minhasNotasFiscais"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhuma nota fiscal.</p></div>
             </div>
         </div>
 
         <div id="tabClienteAgenda" class="hidden">
             <div class="dashboard-card">
-                <h3>📅 Próximos Vencimentos</h3>
+                <h3 style="font-size:1rem; margin-bottom:0.8rem;">📅 Próximos Vencimentos</h3>
                 <div id="vencimentosCliente"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhum vencimento.</p></div>
             </div>
         </div>
@@ -1142,7 +1325,7 @@
 
     // ============ LOGO ============
     const LOGO_URL = 'https://i.ibb.co/YFgf5SbT/logo.png';
-    document.getElementById('logoContainer').innerHTML = `<img src="${LOGO_URL}" alt="Império Contábil" style="width:100%; height:100%; object-fit:contain;">`;
+    document.getElementById('logoContainer').innerHTML = `<img src="${LOGO_URL}" alt="Império Contábil" loading="lazy" decoding="async">`;
 
     const dbRef = firestore.collection('config').doc('principal');
     const clientesRef = firestore.collection('clientes');
@@ -1274,8 +1457,11 @@
     }
 
     function alternarTabAdmin(tab) {
-        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
+        const tabs = document.querySelectorAll('.admin-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        if (event && event.target) event.target.classList.add('active');
+        else tabs[0].classList.add('active');
+        
         document.getElementById('tabNFs').classList.toggle('hidden', tab !== 'nfs');
         document.getElementById('tabClientes').classList.toggle('hidden', tab !== 'clientes');
         document.getElementById('tabAtividades').classList.toggle('hidden', tab !== 'atividades');
@@ -1294,8 +1480,11 @@
     }
 
     function alternarTabCliente(tab) {
-        document.querySelectorAll('.cliente-tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
+        const tabs = document.querySelectorAll('.cliente-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        if (event && event.target) event.target.classList.add('active');
+        else tabs[0].classList.add('active');
+        
         document.getElementById('tabClienteDashboard').classList.toggle('hidden', tab !== 'dashboard');
         document.getElementById('tabClienteNotas').classList.toggle('hidden', tab !== 'notas');
         document.getElementById('tabClienteAgenda').classList.toggle('hidden', tab !== 'agenda');
@@ -1337,16 +1526,15 @@
         nfs.sort((a, b) => b.id.localeCompare(a.id));
         container.innerHTML = nfs.map(nf => `
             <div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
-                    <div style="flex:1;">
-                        <h4>NF #${nf.id} - ${nf.produto}</h4>
-                        <p><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | <strong>Pagamento:</strong> ${nf.pagamento}</p>
-                        <p><strong>Solicitante:</strong> ${nf.clienteNome} (${nf.clienteDoc})</p>
-                        <p><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p>
-                        <p><strong>Endereço:</strong> ${nf.endereco}</p>
-                        <p><strong>Data:</strong> ${nf.data}</p>
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                    <div style="flex:1; min-width:150px;">
+                        <h4 style="font-size:0.95rem;">NF #${nf.id} - ${nf.produto}</h4>
+                        <p style="font-size:0.85rem;"><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | <strong>Pagamento:</strong> ${nf.pagamento}</p>
+                        <p style="font-size:0.85rem;"><strong>Solicitante:</strong> ${nf.clienteNome} (${nf.clienteDoc})</p>
+                        <p style="font-size:0.85rem;"><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p>
+                        <p style="font-size:0.85rem;"><strong>Data:</strong> ${nf.data}</p>
                     </div>
-                    <div style="text-align:right; min-width:120px;">
+                    <div style="text-align:right; min-width:80px;">
                         <span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span>
                         ${nf.status === 'Pendente' ? `<br><button class="btn-emitir" onclick="emitirNF('${nf.id}')">✅ Emitir</button>` : ''}
                         <br><button class="btn-excluir" onclick="excluirNF('${nf.id}')">🗑️</button>
@@ -1407,9 +1595,11 @@
         docs.forEach(doc => {
             const c = clientes[doc];
             html += `<tr>
-                <td>${doc}</td><td>${c.nome}</td><td>${c.senha}</td>
-                <td><input type="number" id="rec_${doc}" value="${c.receitas}" step="0.01" class="input-small" style="width:100px;"></td>
-                <td><input type="number" id="desp_${doc}" value="${c.despesas}" step="0.01" class="input-small" style="width:100px;"></td>
+                <td style="font-size:0.7rem;">${doc}</td>
+                <td style="font-size:0.8rem;">${c.nome}</td>
+                <td style="font-size:0.8rem;">${c.senha}</td>
+                <td><input type="number" id="rec_${doc}" value="${c.receitas}" step="0.01" class="input-small" style="width:80px;"></td>
+                <td><input type="number" id="desp_${doc}" value="${c.despesas}" step="0.01" class="input-small" style="width:80px;"></td>
                 <td><button class="btn-salvar" onclick="atualizarCliente('${doc}')">💾</button> <button class="btn-excluir" onclick="removerCliente('${doc}')">🗑️</button></td>
             </tr>`;
         });
@@ -1478,12 +1668,12 @@
         div.innerHTML = docsCliente.map(doc => `
             <a href="${doc.link}" target="_blank" class="documento-link ${doc.novo ? 'documento-novo' : ''}">
                 <i class="fas fa-file-pdf"></i>
-                <div>
+                <div style="flex:1;">
                     <strong>${doc.nome}</strong>
                     ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : ''}
                     <br><small>${doc.tipo.toUpperCase()} - ${doc.data}</small>
                 </div>
-                <i class="fas fa-external-link-alt" style="margin-left:auto;"></i>
+                <i class="fas fa-external-link-alt" style="flex-shrink:0;"></i>
             </a>
         `).join('');
     }
@@ -1519,16 +1709,16 @@
             return `
                 <div class="doc-card">
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
-                        <div style="flex:1;">
-                            <strong>📄 ${doc.nome}</strong>
+                        <div style="flex:1; min-width:150px;">
+                            <strong style="font-size:0.9rem;">📄 ${doc.nome}</strong>
                             ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : '<span class="badge badge-verde">Visualizado</span>'}
                             <br><small>Cliente: ${cliente.nome} (${doc.clienteDoc})</small>
                             <br><small>Tipo: ${tiposLabel[doc.tipo] || doc.tipo} | Data: ${doc.data}</small>
                         </div>
-                        <div style="text-align:right; min-width:200px;">
-                            <a href="${doc.link}" target="_blank" style="color:#3498db; text-decoration:none; font-weight:600;">🔗 Abrir</a>
-                            <button class="btn-salvar" onclick="marcarComoVisto('${doc.id}')" style="margin-left:0.5rem;">✅ Visto</button>
-                            <button class="btn-excluir" onclick="excluirDocumento('${doc.id}')" style="margin-left:0.5rem;">🗑️</button>
+                        <div style="text-align:right; min-width:150px;">
+                            <a href="${doc.link}" target="_blank" style="color:#3498db; text-decoration:none; font-weight:600; font-size:0.85rem;">🔗 Abrir</a>
+                            <button class="btn-salvar" onclick="marcarComoVisto('${doc.id}')" style="margin-left:0.3rem;">✅ Visto</button>
+                            <button class="btn-excluir" onclick="excluirDocumento('${doc.id}')" style="margin-left:0.3rem;">🗑️</button>
                         </div>
                     </div>
                 </div>
@@ -1618,9 +1808,9 @@
             const cliente = clientes[v.clienteDoc] || { nome: 'Cliente não encontrado' };
             return `
                 <div class="vencimento-card ${status.status}">
-                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                         <div>
-                            <strong>${tiposLabel[v.tipo] || v.tipo}</strong> - ${cliente.nome}
+                            <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong> - ${cliente.nome}
                             <br><small>Competência: ${v.competencia} | Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
                         </div>
                         <div style="text-align:right;">
@@ -1659,7 +1849,7 @@
             const status = calcularStatusVencimento(v.dataVencimento);
             return `
                 <div class="vencimento-card ${status.status}">
-                    <strong>${tiposLabel[v.tipo] || v.tipo}</strong>
+                    <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong>
                     <br><small>Competência: ${v.competencia}</small>
                     <br><small>Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
                     <br><span class="badge ${status.badge}">${status.label} - ${status.dias}</span>
@@ -1668,12 +1858,11 @@
         }).join('');
     }
 
-    // ============ ATIVIDADES (MODIFICADO) ============
+    // ============ ATIVIDADES ============
     async function inicializarAtividades(clienteDoc) {
         db = await carregarDB();
         if (!db.atividades) db.atividades = {};
         if (!db.atividades[clienteDoc]) {
-            // Cria uma cópia profunda das atividades padrão, cada uma com observação e data de atualização vazias
             db.atividades[clienteDoc] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
             await salvarDB(db);
         }
@@ -1691,9 +1880,8 @@
         const clientes = await carregarClientes();
         const nomeCliente = clientes[doc]?.nome || 'Cliente';
 
-        // Monta a lista de atividades sem status, apenas com observação e data de atualização
-        let html = `<p><strong>Cliente:</strong> ${nomeCliente} (${doc})</p>`;
-        html += '<div style="margin-top: 1rem;">';
+        let html = `<p style="font-size:0.9rem; margin-bottom:0.8rem;"><strong>Cliente:</strong> ${nomeCliente} (${doc})</p>`;
+        html += '<div style="margin-top: 0.5rem;">';
         atividades.forEach((ativ, index) => {
             const dataAtualizacao = ativ.ultimaAtualizacao || 'Nunca atualizada';
             const obs = ativ.observacao || '';
@@ -1704,8 +1892,8 @@
                         <small>Última atualização: ${dataAtualizacao}</small>
                     </div>
                     <div class="acoes">
-                        <textarea id="obs_${doc}_${index}" placeholder="Observação..." rows="1" style="min-width:120px;">${obs}</textarea>
-                        <input type="date" id="data_${doc}_${index}" value="${ativ.ultimaAtualizacao || ''}" style="width:auto; max-width:150px;">
+                        <textarea id="obs_${doc}_${index}" placeholder="Observação..." rows="1">${obs}</textarea>
+                        <input type="date" id="data_${doc}_${index}" value="${ativ.ultimaAtualizacao || ''}">
                         <button class="btn-salvar" onclick="salvarAtividade('${doc}', ${index})">💾 Salvar</button>
                     </div>
                 </div>
@@ -1723,12 +1911,10 @@
         }
         const obs = document.getElementById(`obs_${doc}_${index}`).value;
         const data = document.getElementById(`data_${doc}_${index}`).value;
-        // Atualiza os campos
         db.atividades[doc][index].observacao = obs;
         db.atividades[doc][index].ultimaAtualizacao = data;
         await salvarDB(db);
         alert('✅ Atividade salva com sucesso!');
-        // Recarrega a lista para refletir a data atualizada
         carregarAtividades();
     }
 
@@ -1754,12 +1940,12 @@
                 <div class="placar-item"><div class="label">Folha Pagamento</div><div class="valor">R$ ${folha.toFixed(2)}</div></div>
                 <div class="placar-item"><div class="label">Fator R</div><div class="valor">${fatorR.toFixed(1)}%</div><span class="fator-r-badge ${classeFator}">${textoFator}</span></div>
             </div>
-            <div style="margin-top:1rem; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem;">
-                <div><label>Pró-Labore</label><input type="number" id="editPL" value="${pl}" step="0.01" class="input-small"></div>
-                <div><label>Faturamento 12m</label><input type="number" id="editFat12" value="${fat12}" step="0.01" class="input-small"></div>
-                <div><label>Folha Pagamento</label><input type="number" id="editFolha" value="${folha}" step="0.01" class="input-small"></div>
+            <div style="margin-top:0.8rem; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem;">
+                <div><label style="font-size:0.8rem; font-weight:600;">Pró-Labore</label><input type="number" id="editPL" value="${pl}" step="0.01" class="input-small"></div>
+                <div><label style="font-size:0.8rem; font-weight:600;">Faturamento 12m</label><input type="number" id="editFat12" value="${fat12}" step="0.01" class="input-small"></div>
+                <div><label style="font-size:0.8rem; font-weight:600;">Folha Pagamento</label><input type="number" id="editFolha" value="${folha}" step="0.01" class="input-small"></div>
             </div>
-            <button class="btn-emitir" onclick="salvarFatorR('${doc}')" style="width:100%; margin-top:1rem;">💾 Salvar</button>
+            <button class="btn-emitir" onclick="salvarFatorR('${doc}')" style="width:100%; margin-top:0.8rem;">💾 Salvar</button>
         `;
     }
 
@@ -1791,10 +1977,10 @@
 
         div.innerHTML = minhasNFs.map(nf => `
             <div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}">
-                <h4>NF #${nf.id} - ${nf.produto}</h4>
-                <p><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | <strong>Pagamento:</strong> ${nf.pagamento}</p>
-                <p><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p>
-                <p><strong>Data:</strong> ${nf.data}</p>
+                <h4 style="font-size:0.95rem;">NF #${nf.id} - ${nf.produto}</h4>
+                <p style="font-size:0.85rem;"><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | <strong>Pagamento:</strong> ${nf.pagamento}</p>
+                <p style="font-size:0.85rem;"><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p>
+                <p style="font-size:0.85rem;"><strong>Data:</strong> ${nf.data}</p>
                 <div style="text-align:right;">
                     <span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span>
                 </div>
