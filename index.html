@@ -11,71 +11,771 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: linear-gradient(135deg, #0b3b5c 0%, #1a5276 50%, #2c3e50 100%); min-height: 100vh; }
-        .navbar { background: rgba(255,255,255,0.97); padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .logo { display: flex; align-items: center; gap: 16px; }
-        .logo-icon { width: 100px; height: 100px; }
-        .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-        .logo-text h1 { font-size: 1.8rem; font-weight: 700; color: #0b3b5c; }
-        .logo-text span { font-size: 0.85rem; color: #5a7d9a; }
-        .btn-area-cliente { background: #0b3b5c; color: white; padding: 0.75rem 1.8rem; border-radius: 50px; font-weight: 600; border: none; cursor: pointer; }
-        .hero { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
-        .hero-title { text-align: center; color: white; margin-bottom: 3rem; }
-        .hero-title h2 { font-size: 2.5rem; }
-        .mvv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .card-mvv { background: white; padding: 2rem; border-radius: 16px; border-top: 5px solid #0b3b5c; }
-        .card-mvv h3 { color: #0b3b5c; margin-bottom: 0.5rem; }
-        .card-mvv p { color: #5a6f7e; }
-        .contact-section { text-align: center; padding: 2rem 0; }
-        .social-buttons { display: flex; gap: 1rem; justify-content: center; }
-        .btn-social { padding: 0.8rem 1.5rem; border-radius: 50px; color: white; text-decoration: none; font-weight: 600; }
-        .btn-whatsapp { background: #25D366; }
-        .btn-instagram { background: #E4405F; }
-        .btn-admin-link { display: block; text-align: center; margin-top: 1.5rem; color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer; }
-        .hidden { display: none !important; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .login-box { background: white; border-radius: 20px; padding: 2rem; width: 90%; max-width: 400px; }
-        .login-box h2 { text-align: center; color: #0b3b5c; margin-bottom: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
-        .form-group input { width: 100%; padding: 0.8rem; border: 2px solid #e0e6ed; border-radius: 10px; }
-        .btn-login { width: 100%; padding: 0.9rem; background: #0b3b5c; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .error-msg { background: #ffe0e0; color: #c0392b; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
-        .admin-panel { background: #f0f4f8; min-height: 100vh; }
-        .admin-header { background: #0b1e2f; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .admin-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .admin-tab { padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); color: white; background: transparent; font-weight: 500; font-size: 0.85rem; }
-        .admin-tab.active { background: white; color: #0b1e2f; }
-        .admin-content { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        .card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-        .btn-salvar { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .btn-upload { background: #27ae60; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #0b1e2f; color: white; padding: 0.8rem; text-align: left; }
-        td { padding: 0.6rem; border-bottom: 1px solid #ecf0f1; }
-        input, select, textarea { width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
-        .cliente-panel { background: #f0f4f8; min-height: 100vh; }
-        .cliente-header { background: #0b1e2f; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .cliente-tabs { display: flex; gap: 0.5rem; }
-        .cliente-tab { padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); color: white; background: transparent; font-size: 0.85rem; }
-        .cliente-tab.active { background: white; color: #0b1e2f; }
-        .cliente-content { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-        .dashboard-card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-        .saldo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-        .saldo-item { background: #eaf2f8; padding: 1rem; border-radius: 10px; text-align: center; }
-        .saldo-item .valor { font-size: 1.3rem; font-weight: 700; color: #0b3b5c; }
-        .doc-card { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.5rem; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        @media (max-width: 600px) { .saldo-grid { grid-template-columns: 1fr; } .logo-icon { width: 70px; height: 70px; } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0b3b5c 0%, #1a5276 50%, #2c3e50 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0b3b5c;
+            line-height: 1.2;
+        }
+
+        .logo-text span {
+            font-size: 0.85rem;
+            color: #5a7d9a;
+            font-weight: 500;
+        }
+
+        .btn-area-cliente {
+            background: linear-gradient(135deg, #0b3b5c, #1a5276);
+            color: white;
+            padding: 0.75rem 1.8rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(11,59,92,0.3);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-area-cliente:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(11,59,92,0.4);
+        }
+
+        .hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .hero-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .mvv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 3rem;
+        }
+
+        .card-mvv {
+            background: white;
+            padding: 2.2rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            border-top: 5px solid #0b3b5c;
+        }
+
+        .card-mvv:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card-mvv .icon-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0b3b5c, #1a5276);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .card-mvv h3 {
+            font-size: 1.5rem;
+            color: #0b3b5c;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-mvv p {
+            color: #5a6f7e;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .contact-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .contact-section h3 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-social {
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            box-shadow: 0 5px 15px rgba(37,211,102,0.4);
+        }
+
+        .btn-instagram {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            box-shadow: 0 5px 15px rgba(220,39,67,0.4);
+        }
+
+        .btn-social:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-admin-link {
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .btn-admin-link:hover {
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 2.8rem;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .login-box .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #95a5a6;
+            background: none;
+            border: none;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: #0b3b5c;
+            margin-bottom: 0.5rem;
+            font-size: 1.6rem;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #95a5a6;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #0b3b5c;
+        }
+
+        .btn-login-submit {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #0b3b5c, #1a5276);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .btn-login-submit:hover {
+            background: linear-gradient(135deg, #0d4a72, #1e5f85);
+        }
+
+        .error-msg {
+            background: #ffe0e0;
+            color: #c0392b;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .admin-panel {
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: #0b1e2f;
+            color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            background: transparent;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .admin-tab.active {
+            background: white;
+            color: #0b1e2f;
+            border-color: white;
+        }
+
+        .admin-content {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .nf-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border-left: 5px solid #f39c12;
+        }
+
+        .nf-card.emitida {
+            border-left-color: #27ae60;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-pendente {
+            background: #fef3cd;
+            color: #856404;
+        }
+
+        .badge-emitida {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-emitir, .btn-status {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-right: 0.3rem;
+        }
+
+        .btn-excluir {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-backup {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .btn-upload {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .btn-visto {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #0b1e2f;
+            color: white;
+            padding: 0.8rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #ecf0f1;
+            vertical-align: top;
+        }
+
+        .input-small {
+            width: 100%;
+            padding: 0.4rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .input-obs {
+            width: 100%;
+            padding: 0.4rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            resize: vertical;
+        }
+
+        .btn-salvar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .documento-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: 0.3s;
+        }
+
+        .documento-link:hover {
+            background: #e8f4fd;
+        }
+
+        .documento-link i {
+            color: #e74c3c;
+            font-size: 1.2rem;
+        }
+
+        .documento-novo {
+            background: #fff3cd;
+            border: 2px solid #f39c12;
+        }
+
+        .placar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .placar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .placar-item {
+            background: #f0f4f8;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .placar-item .label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .placar-item .valor {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0b3b5c;
+        }
+
+        .fator-r-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .fator-r-ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .fator-r-alerta {
+            background: #fef3cd;
+            color: #856404;
+        }
+
+        .fator-r-ruim {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .cliente-panel {
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
+
+        .cliente-header {
+            background: #0b1e2f;
+            color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .cliente-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .cliente-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            background: transparent;
+            font-weight: 500;
+            transition: 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .cliente-tab.active {
+            background: white;
+            color: #0b1e2f;
+            border-color: white;
+        }
+
+        .cliente-content {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .saldo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .saldo-item {
+            background: #eaf2f8;
+            padding: 1.2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .saldo-item .valor {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0b3b5c;
+        }
+
+        .saldo-item .rotulo {
+            font-size: 0.8rem;
+            color: #5a6f7e;
+        }
+
+        .btn-solicitar {
+            background: #0b3b5c;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.8rem;
+        }
+
+        .vencimento-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #27ae60;
+        }
+
+        .doc-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            margin: 0.4rem 0 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            font-size: 1.5rem;
+            color: #0b3b5c;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #0b3b5c;
+        }
+
+        @media (max-width: 600px) {
+            .saldo-grid, .placar-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-title h2 {
+                font-size: 2rem;
+            }
+            .logo-icon {
+                width: 80px;
+                height: 80px;
+            }
+            .logo-text h1 {
+                font-size: 1.4rem;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="loadingOverlay" class="loading-overlay">
     <div style="text-align:center;">
-        <i class="fas fa-spinner fa-spin" style="font-size:3rem; color:#0b3b5c;"></i>
-        <p style="margin-top:1rem; color:#0b3b5c;">Carregando...</p>
+        <i class="fas fa-spinner fa-spin" style="font-size:3rem;"></i>
+        <p style="margin-top:1rem;">Conectando ao servidor...</p>
     </div>
 </div>
 
@@ -83,44 +783,87 @@
 <div id="paginaInicial">
     <nav class="navbar">
         <div class="logo">
-            <div class="logo-icon"><img src="https://i.ibb.co/YFgf5SbT/logo.png" alt="Império Contábil"></div>
-            <div class="logo-text"><h1>Império Contábil</h1><span>Contabilidade estratégica</span></div>
-        </div>
-        <button class="btn-area-cliente" onclick="abrirLogin('cliente')">Área do Cliente</button>
-    </nav>
-    <div class="hero">
-        <div class="hero-title"><h2>Sua contabilidade descomplicada</h2><p>Justiça tributária para pequenas e micro empresas</p></div>
-        <div class="mvv-grid">
-            <div class="card-mvv"><h3>Missão</h3><p>Trazer justiça tributária para pequenas e micro empresas brasileiras.</p></div>
-            <div class="card-mvv"><h3>Visão</h3><p>Ser referência no atendimento prático e simples.</p></div>
-            <div class="card-mvv"><h3>Valores</h3><p>Respeito, honra e praticidade.</p></div>
-        </div>
-        <div class="contact-section">
-            <div class="social-buttons">
-                <a href="https://wa.me/5511999999999" class="btn-social btn-whatsapp" target="_blank">WhatsApp</a>
-                <a href="https://instagram.com/imperiocontabil" class="btn-social btn-instagram" target="_blank">Instagram</a>
+            <div class="logo-icon" id="logoContainer"></div>
+            <div class="logo-text">
+                <h1>Império Contábil</h1>
+                <span>Contabilidade estratégica</span>
             </div>
         </div>
-        <a class="btn-admin-link" onclick="abrirLogin('admin')">🔐 Acesso Administrativo</a>
+        <button class="btn-area-cliente" onclick="abrirLogin('cliente')">
+            <i class="fas fa-lock"></i> Área do Cliente
+        </button>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-title">
+            <h2>Sua contabilidade descomplicada</h2>
+            <p>Justiça tributária para pequenas e micro empresas brasileiras</p>
+        </div>
+        <div class="mvv-grid">
+            <div class="card-mvv">
+                <div class="icon-circle"><i class="fas fa-bullseye"></i></div>
+                <h3>Missão</h3>
+                <p>Trazer justiça tributária para pequenas e micro empresas brasileiras, reduzindo seus custos com impostos e auxiliando em melhorias contra a burocracia.</p>
+            </div>
+            <div class="card-mvv">
+                <div class="icon-circle"><i class="fas fa-eye"></i></div>
+                <h3>Visão</h3>
+                <p>Ser referência no atendimento prático e simples a todo tipo de empreendedor, principalmente a pequenas empresas e MEI.</p>
+            </div>
+            <div class="card-mvv">
+                <div class="icon-circle"><i class="fas fa-handshake"></i></div>
+                <h3>Valores</h3>
+                <p>Respeito, honra e praticidade. Acreditamos que é possível descomplicar a burocracia.</p>
+            </div>
+        </div>
+        <div class="contact-section">
+            <h3>Fale Conosco</h3>
+            <div class="social-buttons">
+                <a href="https://wa.me/5511999999999" class="btn-social btn-whatsapp" target="_blank">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Business
+                </a>
+                <a href="https://instagram.com/imperiocontabil" class="btn-social btn-instagram" target="_blank">
+                    <i class="fab fa-instagram"></i> Instagram
+                </a>
+            </div>
+        </div>
+        <a href="#" class="btn-admin-link" onclick="abrirLogin('admin')">
+            <i class="fas fa-crown"></i> Acesso Administrativo
+        </a>
     </div>
 </div>
 
 <!-- LOGIN -->
 <div id="loginModal" class="login-overlay hidden">
     <div class="login-box">
-        <h2 id="loginTitulo">Login</h2>
-        <div class="error-msg" id="loginErro">Credenciais incorretas!</div>
-        <div class="form-group"><label>CPF/CNPJ</label><input type="text" id="inputDocumento"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="inputSenha"></div>
-        <button class="btn-login" onclick="realizarLogin()">Entrar</button>
-        <button class="btn-login" style="background:#95a5a6; margin-top:0.5rem;" onclick="fecharLogin()">Voltar</button>
+        <button class="close-btn" onclick="fecharLogin()">✕</button>
+        <h2 id="loginTitulo">Acessar Painel</h2>
+        <p class="subtitle" id="loginSubtitulo">Digite suas credenciais</p>
+        <div class="error-msg" id="loginErro"></div>
+        <form onsubmit="realizarLogin(event)">
+            <div class="form-group">
+                <label>CPF ou CNPJ</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="inputDocumento" placeholder="Apenas números" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="inputSenha" placeholder="Sua senha" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-login-submit">Entrar</button>
+        </form>
     </div>
 </div>
 
 <!-- PAINEL ADMIN -->
 <div id="painelAdmin" class="admin-panel hidden">
     <div class="admin-header">
-        <h2>Painel Admin</h2>
+        <h2><i class="fas fa-crown"></i> Painel Administrativo</h2>
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="alternarTabAdmin('nfs', this)">📋 NF</button>
             <button class="admin-tab" onclick="alternarTabAdmin('clientes', this)">👥 Clientes</button>
@@ -132,43 +875,46 @@
         <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()">Sair</button>
     </div>
     <div class="admin-content">
-        <div id="tabAdminNFs" class="card">
-            <h3>📋 Notas Fiscais</h3>
-            <div id="listaNFsAdmin"><p>📭 Nenhuma NF</p></div>
+        <div id="tabAdminNFs">
+            <h3 style="margin-bottom:1rem;">📋 Notas Fiscais</h3>
+            <div id="listaNFsAdmin"><p style="color:#7f8c8d;">📭 Nenhuma NF</p></div>
         </div>
-        <div id="tabAdminClientes" class="card hidden">
-            <h3>👥 Clientes</h3>
-            <input type="text" id="novoDoc" placeholder="CPF/CNPJ">
-            <input type="text" id="novoNome" placeholder="Nome">
-            <input type="text" id="novaSenha" placeholder="Senha">
+        <div id="tabAdminClientes" class="hidden">
+            <h3 style="margin-bottom:1rem;">👥 Clientes</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
+                <input type="text" id="novoDoc" placeholder="CPF/CNPJ">
+                <input type="text" id="novoNome" placeholder="Nome">
+                <input type="text" id="novaSenha" placeholder="Senha">
+            </div>
             <button class="btn-upload" onclick="adicionarCliente()">✅ Cadastrar</button>
             <div id="listaClientes" style="margin-top:1rem;"></div>
         </div>
-        <div id="tabAdminAtividades" class="card hidden">
-            <h3>📝 Atividades</h3>
-            <p style="color:#7f8c8d; margin-bottom:0.5rem;">Selecione um cliente:</p>
+        <div id="tabAdminAtividades" class="hidden">
+            <h3 style="margin-bottom:1rem;">📝 Atividades</h3>
+            <p style="color:#7f8c8d; margin-bottom:0.5rem;">Selecione um cliente para gerenciar as atividades.</p>
             <select id="selectClienteAtividade" onchange="carregarAtividades()" style="margin-bottom:1rem;">
-                <option value="">Selecione...</option>
+                <option value="">Selecione o cliente...</option>
             </select>
-            <div id="tabelaAtividades"></div>
+            <div id="tabelaAtividades"><p style="color:#7f8c8d;">Selecione um cliente.</p></div>
         </div>
-        <div id="tabAdminDocumentos" class="card hidden">
-            <h3>📁 Documentos</h3>
+        <div id="tabAdminDocumentos" class="hidden">
+            <h3 style="margin-bottom:1rem;">📁 Adicionar Documento</h3>
+            <div class="info-box">Suba no Google Drive → Compartilhar → "Qualquer pessoa com link" → Cole aqui</div>
             <select id="selectClienteDoc"><option value="">Cliente...</option></select>
             <input type="text" id="nomeDocumento" placeholder="Nome do documento">
             <input type="text" id="linkDocumento" placeholder="Link Google Drive">
             <button class="btn-upload" onclick="adicionarDocumento()">📤 Adicionar</button>
         </div>
-        <div id="tabAdminAgenda" class="card hidden">
-            <h3>📅 Agenda</h3>
+        <div id="tabAdminAgenda" class="hidden">
+            <h3 style="margin-bottom:1rem;">📅 Agenda Fiscal</h3>
             <select id="selectClienteVenc"><option value="">Cliente...</option></select>
             <select id="tipoObrigacao"><option>DAS</option><option>Parcelamento DAS</option><option>INSS</option><option>DCTFWeb</option></select>
             <input type="month" id="competenciaVenc">
             <button class="btn-upload" onclick="adicionarVencimento()">➕ Adicionar</button>
             <div id="listaVencimentos" style="margin-top:1rem;"></div>
         </div>
-        <div id="tabAdminFatorR" class="card hidden">
-            <h3>📊 Fator R</h3>
+        <div id="tabAdminFatorR" class="hidden">
+            <h3 style="margin-bottom:1rem;">📊 Fator R</h3>
             <select id="selectClienteFator" onchange="carregarFatorR()"><option value="">Cliente...</option></select>
             <div id="placarFator"></div>
         </div>
@@ -178,7 +924,7 @@
 <!-- PAINEL CLIENTE -->
 <div id="painelCliente" class="cliente-panel hidden">
     <div class="cliente-header">
-        <h2><span id="nomeClienteHeader"></span></h2>
+        <h2><i class="fas fa-user"></i> <span id="nomeClienteHeader"></span></h2>
         <div class="cliente-tabs">
             <button class="cliente-tab active" onclick="alternarTabCliente('dashboard', this)">📊 Dashboard</button>
             <button class="cliente-tab" onclick="alternarTabCliente('notas', this)">📝 Notas</button>
@@ -191,19 +937,19 @@
             <div class="dashboard-card">
                 <h3>📊 Dashboard</h3>
                 <div class="saldo-grid">
-                    <div class="saldo-item">Receitas<br><span class="valor" id="recCliente">R$ 0</span></div>
-                    <div class="saldo-item">Despesas<br><span class="valor" id="despCliente">R$ 0</span></div>
-                    <div class="saldo-item">Saldo<br><span class="valor" id="saldoCliente">R$ 0</span></div>
+                    <div class="saldo-item"><div class="rotulo">Receitas</div><div class="valor" id="recCliente">R$ 0</div></div>
+                    <div class="saldo-item"><div class="rotulo">Despesas</div><div class="valor" id="despCliente">R$ 0</div></div>
+                    <div class="saldo-item"><div class="rotulo">Saldo</div><div class="valor" id="saldoCliente">R$ 0</div></div>
                 </div>
             </div>
-            <div class="dashboard-card"><h3>📁 Documentos</h3><div id="documentosCliente"></div></div>
+            <div class="dashboard-card"><h3>📁 Meus Documentos</h3><div id="documentosCliente"></div></div>
         </div>
         <div id="tabClienteNotas" class="hidden">
             <div class="dashboard-card">
                 <h3>📝 Solicitar NF</h3>
                 <input type="number" id="nfValor" placeholder="Valor">
                 <input type="text" id="nfProduto" placeholder="Produto/Serviço">
-                <button class="btn-upload" onclick="solicitarNF()">Solicitar</button>
+                <button class="btn-solicitar" onclick="solicitarNF()">Solicitar NF</button>
             </div>
             <div class="dashboard-card"><h3>📋 Minhas NFs</h3><div id="minhasNFs"></div></div>
         </div>
@@ -227,6 +973,8 @@
     const firestore = firebase.firestore();
     const dbRef = firestore.collection('config').doc('principal');
     const clientesRef = firestore.collection('clientes');
+
+    document.getElementById('logoContainer').innerHTML = '<img src="https://i.ibb.co/YFgf5SbT/logo.png" style="width:100%;height:100%;object-fit:contain;">';
 
     let usuarioAtual = null;
     let tipoLoginAtual = 'admin';
@@ -272,11 +1020,12 @@
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function abrirLogin(tipo) { tipoLoginAtual = tipo; document.getElementById('loginErro').style.display = 'none'; mostrarTela('loginModal'); }
+    function abrirLogin(tipo) { tipoLoginAtual = tipo; document.getElementById('loginTitulo').textContent = tipo === 'admin' ? 'Login Admin' : 'Login Cliente'; document.getElementById('loginErro').style.display = 'none'; mostrarTela('loginModal'); }
     function fecharLogin() { mostrarTela('paginaInicial'); }
     function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
 
-    async function realizarLogin() {
+    async function realizarLogin(e) {
+        e.preventDefault();
         const doc = document.getElementById('inputDocumento').value.replace(/\D/g, '');
         const senha = document.getElementById('inputSenha').value;
         const db = await carregarDB();
@@ -290,6 +1039,7 @@
             carregarPainelCliente();
             mostrarTela('painelCliente');
         } else {
+            document.getElementById('loginErro').textContent = 'Credenciais incorretas!';
             document.getElementById('loginErro').style.display = 'block';
         }
     }
@@ -358,11 +1108,11 @@
         Object.keys(cli).forEach(doc => { select.innerHTML += `<option value="${doc}">${cli[doc].nome}</option>`; });
     }
 
-    // ============ ATIVIDADES (SEM FILTRO DE COMPETÊNCIA) ============
+    // ============ ATIVIDADES ============
     async function carregarAtividades() {
         const doc = document.getElementById('selectClienteAtividade').value;
         const div = document.getElementById('tabelaAtividades');
-        if (!doc) { div.innerHTML = '<p>Selecione um cliente.</p>'; return; }
+        if (!doc) { div.innerHTML = '<p style="color:#7f8c8d;">Selecione um cliente.</p>'; return; }
         atividadeClienteAtual = doc;
         const db = await carregarDB();
         if (!db.atividades[doc]) { db.atividades[doc] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO)); await salvarDB(db); }
@@ -401,19 +1151,20 @@
         await salvarCliente(doc, { nome, senha, receitas: 0, despesas: 0, fatorR: { proLabore: 0, faturamento12: 0, folhaPagamento: 0 } });
         alert('✅ Cadastrado!');
         carregarListaClientes();
+        carregarSelectAtividades();
     }
 
     async function carregarListaClientes() {
         const cli = await carregarClientes();
-        document.getElementById('listaClientes').innerHTML = Object.keys(cli).map(d => `<div class="doc-card">${cli[d].nome} (${d})</div>`).join('');
+        document.getElementById('listaClientes').innerHTML = Object.keys(cli).map(d => `<div class="doc-card"><strong>${cli[d].nome}</strong> (${d})</div>`).join('');
     }
 
     // ============ NFs ============
     async function carregarNFsAdmin() {
         const db = await carregarDB();
         const div = document.getElementById('listaNFsAdmin');
-        if (db.notasFiscais.length === 0) { div.innerHTML = '<p>📭 Nenhuma NF</p>'; return; }
-        div.innerHTML = db.notasFiscais.map(nf => `<div class="doc-card">${nf.produto} - R$ ${nf.valor} - ${nf.status}</div>`).join('');
+        if (db.notasFiscais.length === 0) { div.innerHTML = '<p style="color:#7f8c8d;">📭 Nenhuma NF</p>'; return; }
+        div.innerHTML = db.notasFiscais.map(nf => `<div class="nf-card">${nf.produto} - R$ ${nf.valor} - ${nf.status}</div>`).join('');
     }
 
     async function solicitarNF() {
@@ -429,7 +1180,7 @@
         if (!usuarioAtual) return;
         const db = await carregarDB();
         const nfs = db.notasFiscais.filter(n => n.clienteDoc === usuarioAtual.dados.documento);
-        document.getElementById('minhasNFs').innerHTML = nfs.length === 0 ? '<p>📭 Nenhuma</p>' : nfs.map(n => `<div class="doc-card">${n.produto} - R$ ${n.valor} - ${n.status}</div>`).join('');
+        document.getElementById('minhasNFs').innerHTML = nfs.length === 0 ? '<p>📭 Nenhuma</p>' : nfs.map(n => `<div class="nf-card">${n.produto} - R$ ${n.valor} - ${n.status}</div>`).join('');
     }
 
     // ============ DOCUMENTOS ============
@@ -482,7 +1233,7 @@
         if (!doc) return;
         const cli = await carregarClientes();
         const c = cli[doc];
-        document.getElementById('placarFator').innerHTML = `<p>Pró-Labore: R$ ${c.fatorR?.proLabore || 0}</p><p>Fat 12m: R$ ${c.fatorR?.faturamento12 || 0}</p><p>Folha: R$ ${c.fatorR?.folhaPagamento || 0}</p>`;
+        document.getElementById('placarFator').innerHTML = `<p><strong>Pró-Labore:</strong> R$ ${c.fatorR?.proLabore || 0}</p><p><strong>Faturamento 12m:</strong> R$ ${c.fatorR?.faturamento12 || 0}</p><p><strong>Folha:</strong> R$ ${c.fatorR?.folhaPagamento || 0}</p>`;
     }
 
     // ============ PAINEL CLIENTE ============
