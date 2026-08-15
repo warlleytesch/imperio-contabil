@@ -1226,8 +1226,18 @@
                     4. Copie o link e cole abaixo
                 </div>
                 <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Cliente</label><select id="selectClienteDoc"><option value="">Escolha...</option></select></div>
-                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Tipo</label><select id="tipoDocumento"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option><option value="extrato">Extrato</option><option value="outro">Outro</option></select></div>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Tipo</label>
+                    <select id="tipoDocumento">
+                        <option value="das">DAS</option>
+                        <option value="inss">INSS/GPS</option>
+                        <option value="dctfweb">DCTFWeb</option>
+                        <option value="parcelamento_sn">Parcelamento Simples Nacional</option>
+                        <option value="extrato">Extrato</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
                 <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Nome</label><input type="text" id="nomeDocumento" placeholder="Ex: DAS - Competência 08/2024"></div>
+                <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Competência (Mês/Ano)</label><input type="month" id="competenciaDocumento"></div>
                 <div class="form-group"><label style="font-weight:600; font-size:0.85rem;">Link Google Drive</label><input type="url" id="linkDocumento" placeholder="https://drive.google.com/file/d/..."></div>
                 <button class="btn-upload" onclick="adicionarDocumentoDrive()">📤 Adicionar Documento</button>
             </div>
@@ -1383,6 +1393,15 @@
         { id: 'conciliacao', nome: 'Conciliação Bancária', observacao: '', ultimaAtualizacao: '' }
     ];
 
+    const TIPOS_OBRIGACAO = {
+        das: { label: 'DAS', vencimentoDia: 20 },
+        inss: { label: 'INSS/GPS', vencimentoDia: 20 },
+        dctfweb: { label: 'DCTFWeb', vencimentoDia: 20 },
+        parcelamento_sn: { label: 'Parcelamento SN', vencimentoDia: 'ultimo' },
+        extrato: { label: 'Extrato', vencimentoDia: null },
+        outro: { label: 'Outro', vencimentoDia: null }
+    };
+
     function estruturaInicial() {
         return {
             admin: { documento: '43751537848', senha: 'imperio1', nome: 'Administrador' },
@@ -1441,13 +1460,14 @@
     }
 
     function getDataVencimento(tipo, ano, mes) {
-        if (tipo === 'parcelamento_sn') {
-            // Último dia do mês de competência
+        const config = TIPOS_OBRIGACAO[tipo] || { vencimentoDia: 20 };
+        if (config.vencimentoDia === 'ultimo') {
             const ultimoDia = getUltimoDiaMes(parseInt(ano), parseInt(mes));
             return new Date(parseInt(ano), parseInt(mes), ultimoDia);
+        } else if (config.vencimentoDia) {
+            return new Date(parseInt(ano), parseInt(mes), config.vencimentoDia);
         } else {
-            // Padrão: dia 20 do mês de competência
-            return new Date(parseInt(ano), parseInt(mes), 20);
+            return null;
         }
     }
 
@@ -1703,15 +1723,17 @@
         });
     }
 
-    // ============ DOCUMENTOS (GOOGLE DRIVE) ============
+    // ============ DOCUMENTOS (GOOGLE DRIVE) COM CRIAÇÃO AUTOMÁTICA DE VENCIMENTO ============
     async function adicionarDocumentoDrive() {
         const clienteDoc = document.getElementById('selectClienteDoc').value;
         const tipo = document.getElementById('tipoDocumento').value;
         const nome = document.getElementById('nomeDocumento').value;
+        const competencia = document.getElementById('competenciaDocumento').value;
         const link = document.getElementById('linkDocumento').value;
 
         if (!clienteDoc) return alert('❌ Selecione um cliente!');
         if (!nome) return alert('❌ Digite o nome do documento!');
+        if (!competencia) return alert('❌ Selecione a competência (Mês/Ano)!');
         if (!link) return alert('❌ Cole o link do Google Drive!');
         if (!link.includes('drive.google.com')) return alert('❌ Link deve ser do Google Drive!');
 
@@ -1724,44 +1746,70 @@
         try {
             if (!db) db = await carregarDB();
             if (!db.documentos) db.documentos = [];
+            
+            // Cria o documento
+            const docId = 'DOC' + Date.now();
             db.documentos.push({
-                id: 'DOC' + Date.now(),
-                clienteDoc, tipo, nome,
+                id: docId,
+                clienteDoc, 
+                tipo, 
+                nome,
+                competencia,
                 link: linkDownload,
                 data: new Date().toLocaleDateString('pt-BR'),
                 novo: true
             });
+
+            // Verifica se o tipo de documento gera vencimento
+            const config = TIPOS_OBRIGACAO[tipo];
+            if (config && config.vencimentoDia) {
+                const [ano, mes] = competencia.split('-');
+                const dataVencimento = getDataVencimento(tipo, ano, mes);
+                
+                if (dataVencimento) {
+                    if (!db.vencimentos) db.vencimentos = [];
+                    
+                    // Verifica se já existe um vencimento igual para não duplicar
+                    const existe = db.vencimentos.some(v => 
+                        v.clienteDoc === clienteDoc && 
+                        v.tipo === tipo && 
+                        v.competencia === competencia
+                    );
+
+                    if (!existe) {
+                        db.vencimentos.push({
+                            id: 'VENC' + Date.now(),
+                            clienteDoc, 
+                            tipo, 
+                            competencia,
+                            dataVencimento: dataVencimento.toISOString(),
+                            status: 'pendente',
+                            label: config.label,
+                            documentoId: docId,
+                            criadoPor: 'documento'
+                        });
+                        console.log('✅ Vencimento criado automaticamente para o documento!');
+                    } else {
+                        console.log('ℹ️ Vencimento já existe para esta competência e cliente.');
+                    }
+                }
+            }
+
             await salvarDB(db);
-            alert('✅ Documento adicionado!');
+            alert('✅ Documento adicionado! ' + (config && config.vencimentoDia ? 'Vencimento criado automaticamente.' : ''));
+            
+            // Limpa os campos
             document.getElementById('nomeDocumento').value = '';
+            document.getElementById('competenciaDocumento').value = '';
             document.getElementById('linkDocumento').value = '';
+            
+            // Recarrega as listas
+            carregarGerenciamentoDocs();
+            carregarVencimentosAdmin();
+            
         } catch (error) {
             alert('❌ Erro: ' + error.message);
         }
-    }
-
-    async function carregarDocumentosCliente() {
-        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
-        if (!db) db = await carregarDB();
-        const docsCliente = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
-        const div = document.getElementById('documentosCliente');
-        
-        if (docsCliente.length === 0) {
-            div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📭 Nenhum documento.</p>';
-            return;
-        }
-
-        div.innerHTML = docsCliente.map(doc => `
-            <a href="${doc.link}" target="_blank" class="documento-link ${doc.novo ? 'documento-novo' : ''}">
-                <i class="fas fa-file-pdf"></i>
-                <div style="flex:1;">
-                    <strong>${doc.nome}</strong>
-                    ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : ''}
-                    <br><small>${doc.tipo.toUpperCase()} - ${doc.data}</small>
-                </div>
-                <i class="fas fa-external-link-alt" style="flex-shrink:0;"></i>
-            </a>
-        `).join('');
     }
 
     // ============ GERENCIAR DOCUMENTOS ============
@@ -1788,10 +1836,20 @@
             return;
         }
 
-        const tiposLabel = { das: 'DAS', inss: 'INSS/GPS', dctfweb: 'DCTFWeb', extrato: 'Extrato', outro: 'Outro' };
+        const tiposLabel = { 
+            das: 'DAS', 
+            inss: 'INSS/GPS', 
+            dctfweb: 'DCTFWeb', 
+            parcelamento_sn: 'Parcelamento SN',
+            extrato: 'Extrato', 
+            outro: 'Outro' 
+        };
 
         div.innerHTML = docs.map(doc => {
             const cliente = clientes[doc.clienteDoc] || { nome: 'Cliente não encontrado' };
+            const config = TIPOS_OBRIGACAO[doc.tipo];
+            const geraVencimento = config && config.vencimentoDia ? '📌 Gera vencimento' : '';
+            
             return `
                 <div class="doc-card">
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
@@ -1799,7 +1857,9 @@
                             <strong style="font-size:0.9rem;">📄 ${doc.nome}</strong>
                             ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : '<span class="badge badge-verde">Visualizado</span>'}
                             <br><small>Cliente: ${cliente.nome} (${doc.clienteDoc})</small>
-                            <br><small>Tipo: ${tiposLabel[doc.tipo] || doc.tipo} | Data: ${doc.data}</small>
+                            <br><small>Tipo: ${tiposLabel[doc.tipo] || doc.tipo} | Competência: ${doc.competencia || '-'}</small>
+                            <br><small>Data: ${doc.data}</small>
+                            ${geraVencimento ? `<br><small style="color:#27ae60;">${geraVencimento}</small>` : ''}
                         </div>
                         <div style="text-align:right; min-width:150px;">
                             <a href="${doc.link}" target="_blank" style="color:#3498db; text-decoration:none; font-weight:600; font-size:0.85rem;">🔗 Abrir</a>
@@ -1826,12 +1886,21 @@
     }
 
     async function excluirDocumento(id) {
-        if (confirm('⚠️ Excluir este documento permanentemente?')) {
+        if (confirm('⚠️ Excluir este documento permanentemente? O vencimento relacionado também será removido.')) {
             if (!db) db = await carregarDB();
-            db.documentos = (db.documentos || []).filter(d => d.id !== id);
-            await salvarDB(db);
-            carregarGerenciamentoDocs();
-            alert('🗑️ Documento excluído!');
+            
+            // Encontra o documento
+            const doc = db.documentos.find(d => d.id === id);
+            if (doc) {
+                // Remove vencimentos relacionados
+                db.vencimentos = (db.vencimentos || []).filter(v => v.documentoId !== id);
+                // Remove o documento
+                db.documentos = db.documentos.filter(d => d.id !== id);
+                await salvarDB(db);
+                carregarGerenciamentoDocs();
+                carregarVencimentosAdmin();
+                alert('🗑️ Documento e vencimento relacionado excluídos!');
+            }
         }
     }
 
@@ -1847,15 +1916,15 @@
         const [ano, mes] = competencia.split('-');
         const dataVencimento = getDataVencimento(tipo, ano, mes);
 
+        if (!dataVencimento) {
+            alert('❌ Tipo de obrigação não possui vencimento definido.');
+            return;
+        }
+
         if (!db) db = await carregarDB();
         if (!db.vencimentos) db.vencimentos = [];
 
-        const tiposLabel = {
-            das: 'DAS',
-            inss: 'INSS/GPS',
-            dctfweb: 'DCTFWeb',
-            parcelamento_sn: 'Parcelamento SN'
-        };
+        const config = TIPOS_OBRIGACAO[tipo];
 
         db.vencimentos.push({
             id: 'VENC' + Date.now(),
@@ -1864,11 +1933,12 @@
             competencia,
             dataVencimento: dataVencimento.toISOString(),
             status: 'pendente',
-            label: tiposLabel[tipo] || tipo
+            label: config.label,
+            criadoPor: 'manual'
         });
 
         await salvarDB(db);
-        alert(`✅ Vencimento de ${tiposLabel[tipo] || tipo} cadastrado!`);
+        alert(`✅ Vencimento de ${config.label} cadastrado!`);
         document.getElementById('competenciaObrigacao').value = '';
         carregarVencimentosAdmin();
     }
@@ -1887,13 +1957,8 @@
     }
 
     function getTipoLabel(tipo) {
-        const labels = {
-            das: 'DAS',
-            inss: 'INSS/GPS',
-            dctfweb: 'DCTFWeb',
-            parcelamento_sn: 'Parcelamento SN'
-        };
-        return labels[tipo] || tipo;
+        const config = TIPOS_OBRIGACAO[tipo];
+        return config ? config.label : tipo;
     }
 
     async function carregarVencimentosAdmin() {
@@ -1912,6 +1977,8 @@
             const cliente = clientes[v.clienteDoc] || { nome: 'Cliente não encontrado' };
             const isPago = v.status === 'pago';
             const tipoLabel = v.label || getTipoLabel(v.tipo);
+            const criadoPor = v.criadoPor === 'documento' ? '📄 (via documento)' : '';
+            
             return `
                 <div class="vencimento-card ${status.status} ${isPago ? 'vencimento-pago' : ''}">
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
@@ -1919,6 +1986,7 @@
                             <strong style="font-size:0.9rem;">${tipoLabel}</strong> - ${cliente.nome}
                             <br><small>Competência: ${v.competencia} | Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
                             ${v.tipo === 'parcelamento_sn' ? '<br><small style="color:#2980b9;">📌 Último dia do mês</small>' : ''}
+                            ${criadoPor ? `<br><small style="color:#7f8c8d;">${criadoPor}</small>` : ''}
                             ${isPago ? '<br><span class="badge badge-pago">✅ PAGO</span>' : ''}
                         </div>
                         <div style="text-align:right;">
@@ -2177,6 +2245,40 @@
         carregarDocumentosCliente();
         carregarMinhasNFs();
         carregarVencimentosCliente();
+    }
+
+    // ============ DOCUMENTOS CLIENTE ============
+    async function carregarDocumentosCliente() {
+        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
+        if (!db) db = await carregarDB();
+        const docsCliente = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('documentosCliente');
+        
+        if (docsCliente.length === 0) {
+            div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📭 Nenhum documento.</p>';
+            return;
+        }
+
+        const tiposLabel = { 
+            das: 'DAS', 
+            inss: 'INSS/GPS', 
+            dctfweb: 'DCTFWeb', 
+            parcelamento_sn: 'Parcelamento SN',
+            extrato: 'Extrato', 
+            outro: 'Outro' 
+        };
+
+        div.innerHTML = docsCliente.map(doc => `
+            <a href="${doc.link}" target="_blank" class="documento-link ${doc.novo ? 'documento-novo' : ''}">
+                <i class="fas fa-file-pdf"></i>
+                <div style="flex:1;">
+                    <strong>${doc.nome}</strong>
+                    ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : ''}
+                    <br><small>${tiposLabel[doc.tipo] || doc.tipo} - ${doc.competencia || ''} | ${doc.data}</small>
+                </div>
+                <i class="fas fa-external-link-alt" style="flex-shrink:0;"></i>
+            </a>
+        `).join('');
     }
 
     // ============ BACKUP ============
