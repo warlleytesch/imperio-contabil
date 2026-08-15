@@ -1250,7 +1250,14 @@
                 <h4 style="margin-bottom:0.8rem; font-size:1rem;">➕ Adicionar Vencimento</h4>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.6rem;">
                     <div><label style="font-weight:600; font-size:0.8rem;">Cliente</label><select id="selectClienteVencimento"><option value="">Escolha...</option></select></div>
-                    <div><label style="font-weight:600; font-size:0.8rem;">Obrigação</label><select id="tipoObrigacao"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option></select></div>
+                    <div><label style="font-weight:600; font-size:0.8rem;">Obrigação</label>
+                        <select id="tipoObrigacao">
+                            <option value="das">DAS</option>
+                            <option value="inss">INSS/GPS</option>
+                            <option value="dctfweb">DCTFWeb</option>
+                            <option value="parcelamento_sn">Parcelamento Simples Nacional</option>
+                        </select>
+                    </div>
                     <div><label style="font-weight:600; font-size:0.8rem;">Competência</label><input type="month" id="competenciaObrigacao"></div>
                 </div>
                 <button class="btn-upload" onclick="adicionarVencimento()" style="margin-top:0.6rem;">➕ Adicionar Vencimento</button>
@@ -1427,6 +1434,21 @@
 
     async function deletarCliente(doc) {
         try { await clientesRef.doc(doc).delete(); } catch (error) { console.error('Erro:', error); }
+    }
+
+    function getUltimoDiaMes(ano, mes) {
+        return new Date(ano, mes + 1, 0).getDate();
+    }
+
+    function getDataVencimento(tipo, ano, mes) {
+        if (tipo === 'parcelamento_sn') {
+            // Último dia do mês de competência
+            const ultimoDia = getUltimoDiaMes(parseInt(ano), parseInt(mes));
+            return new Date(parseInt(ano), parseInt(mes), ultimoDia);
+        } else {
+            // Padrão: dia 20 do mês de competência
+            return new Date(parseInt(ano), parseInt(mes), 20);
+        }
     }
 
     async function inicializar() {
@@ -1823,20 +1845,30 @@
         if (!competencia) return alert('❌ Selecione a competência!');
 
         const [ano, mes] = competencia.split('-');
-        const dataVencimento = new Date(parseInt(ano), parseInt(mes), 20);
+        const dataVencimento = getDataVencimento(tipo, ano, mes);
 
         if (!db) db = await carregarDB();
         if (!db.vencimentos) db.vencimentos = [];
 
+        const tiposLabel = {
+            das: 'DAS',
+            inss: 'INSS/GPS',
+            dctfweb: 'DCTFWeb',
+            parcelamento_sn: 'Parcelamento SN'
+        };
+
         db.vencimentos.push({
             id: 'VENC' + Date.now(),
-            clienteDoc, tipo, competencia,
+            clienteDoc, 
+            tipo, 
+            competencia,
             dataVencimento: dataVencimento.toISOString(),
-            status: 'pendente'
+            status: 'pendente',
+            label: tiposLabel[tipo] || tipo
         });
 
         await salvarDB(db);
-        alert('✅ Vencimento cadastrado!');
+        alert(`✅ Vencimento de ${tiposLabel[tipo] || tipo} cadastrado!`);
         document.getElementById('competenciaObrigacao').value = '';
         carregarVencimentosAdmin();
     }
@@ -1854,6 +1886,16 @@
         return { status: 'ok', label: 'Em dia', badge: 'badge-verde', dias: diffDias + 'd restantes' };
     }
 
+    function getTipoLabel(tipo) {
+        const labels = {
+            das: 'DAS',
+            inss: 'INSS/GPS',
+            dctfweb: 'DCTFWeb',
+            parcelamento_sn: 'Parcelamento SN'
+        };
+        return labels[tipo] || tipo;
+    }
+
     async function carregarVencimentosAdmin() {
         if (!db) db = await carregarDB();
         const vencimentos = db.vencimentos || [];
@@ -1865,18 +1907,18 @@
             return;
         }
 
-        const tiposLabel = { das: 'DAS', inss: 'INSS/GPS', dctfweb: 'DCTFWeb' };
-
         div.innerHTML = vencimentos.map(v => {
             const status = calcularStatusVencimento(v.dataVencimento);
             const cliente = clientes[v.clienteDoc] || { nome: 'Cliente não encontrado' };
             const isPago = v.status === 'pago';
+            const tipoLabel = v.label || getTipoLabel(v.tipo);
             return `
                 <div class="vencimento-card ${status.status} ${isPago ? 'vencimento-pago' : ''}">
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                         <div>
-                            <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong> - ${cliente.nome}
+                            <strong style="font-size:0.9rem;">${tipoLabel}</strong> - ${cliente.nome}
                             <br><small>Competência: ${v.competencia} | Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
+                            ${v.tipo === 'parcelamento_sn' ? '<br><small style="color:#2980b9;">📌 Último dia do mês</small>' : ''}
                             ${isPago ? '<br><span class="badge badge-pago">✅ PAGO</span>' : ''}
                         </div>
                         <div style="text-align:right;">
@@ -1898,7 +1940,6 @@
             if (venc) {
                 venc.status = 'pago';
                 await salvarDB(db);
-                // Recarrega ambas as visualizações
                 carregarVencimentosAdmin();
                 if (usuarioAtual && usuarioAtual.tipo === 'cliente') {
                     carregarVencimentosCliente();
@@ -1931,18 +1972,18 @@
             return;
         }
 
-        const tiposLabel = { das: 'DAS', inss: 'INSS/GPS', dctfweb: 'DCTFWeb' };
-
         div.innerHTML = vencimentos.map(v => {
             const status = calcularStatusVencimento(v.dataVencimento);
             const isPago = v.status === 'pago';
+            const tipoLabel = v.label || getTipoLabel(v.tipo);
             return `
                 <div class="vencimento-card ${status.status} ${isPago ? 'vencimento-pago' : ''}">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
                         <div>
-                            <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong>
+                            <strong style="font-size:0.9rem;">${tipoLabel}</strong>
                             <br><small>Competência: ${v.competencia}</small>
                             <br><small>Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
+                            ${v.tipo === 'parcelamento_sn' ? '<br><small style="color:#2980b9;">📌 Último dia do mês</small>' : ''}
                             ${isPago ? '<br><span class="badge badge-pago">✅ PAGO</span>' : ''}
                         </div>
                         <div style="text-align:right;">
