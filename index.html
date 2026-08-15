@@ -493,6 +493,7 @@
         .badge-amarelo { background: #fef3cd; color: #856404; }
         .badge-vermelho { background: #f8d7da; color: #721c24; }
         .badge-cinza { background: #e0e0e0; color: #333; }
+        .badge-pago { background: #27ae60; color: white; }
 
         /* ===== BOTÕES ===== */
         .btn-emitir, .btn-status {
@@ -510,6 +511,24 @@
         }
 
         .btn-emitir:active, .btn-status:active {
+            transform: scale(0.95);
+        }
+
+        .btn-pagar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.3rem;
+            margin-right: 0.2rem;
+            font-size: 0.75rem;
+            transition: 0.2s;
+        }
+
+        .btn-pagar:active {
             transform: scale(0.95);
         }
 
@@ -898,6 +917,16 @@
         /* ===== HIDDEN ===== */
         .hidden {
             display: none !important;
+        }
+
+        .vencimento-pago {
+            opacity: 0.7;
+            border-left-color: #27ae60 !important;
+        }
+
+        .vencimento-pago .badge {
+            background: #27ae60;
+            color: white;
         }
 
         /* ===== RESPONSIVO ===== */
@@ -1306,7 +1335,6 @@
 </div>
 
 <!-- ==================== FIREBASE E SCRIPTS ==================== -->
-<!-- Carregamento do Firebase com fallback -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -1321,7 +1349,6 @@
         appId: "1:571025656635:web:644093014d8079e5c4051e"
     };
 
-    // Inicializa o Firebase imediatamente
     try {
         firebase.initializeApp(firebaseConfig);
         console.log('✅ Firebase inicializado');
@@ -1403,7 +1430,6 @@
     }
 
     async function inicializar() {
-        // Evita inicialização duplicada
         if (sistemaInicializado) return;
         
         try {
@@ -1411,7 +1437,6 @@
             db = await carregarDB();
             const clientes = await carregarClientes();
             
-            // Cria cliente padrão se não existir
             if (!clientes['61521248000192']) {
                 await salvarCliente('61521248000192', {
                     nome: 'Woodwork Estúdio', 
@@ -1428,10 +1453,8 @@
             console.log('✅ Sistema pronto!');
         } catch (error) {
             console.error('❌ Erro na inicialização:', error);
-            // Mostra erro mas não trava a UI
         }
         
-        // Remove o loading e mostra a página
         const loading = document.getElementById('loadingOverlay');
         if (loading) loading.style.display = 'none';
         mostrarTela('paginaInicial');
@@ -1466,7 +1489,6 @@
         const senha = document.getElementById('inputSenha').value;
         const erroDiv = document.getElementById('loginErro');
         
-        // Garante que o DB está carregado
         if (!db) db = await carregarDB();
         
         try {
@@ -1848,21 +1870,42 @@
         div.innerHTML = vencimentos.map(v => {
             const status = calcularStatusVencimento(v.dataVencimento);
             const cliente = clientes[v.clienteDoc] || { nome: 'Cliente não encontrado' };
+            const isPago = v.status === 'pago';
             return `
-                <div class="vencimento-card ${status.status}">
+                <div class="vencimento-card ${status.status} ${isPago ? 'vencimento-pago' : ''}">
                     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
                         <div>
                             <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong> - ${cliente.nome}
                             <br><small>Competência: ${v.competencia} | Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
+                            ${isPago ? '<br><span class="badge badge-pago">✅ PAGO</span>' : ''}
                         </div>
                         <div style="text-align:right;">
-                            <span class="badge ${status.badge}">${status.label} - ${status.dias}</span>
-                            <br><button class="btn-excluir" onclick="removerVencimento('${v.id}')">🗑️</button>
+                            <span class="badge ${isPago ? 'badge-pago' : status.badge}">${isPago ? 'Pago' : status.label + ' - ' + status.dias}</span>
+                            <br>
+                            ${!isPago ? `<button class="btn-pagar" onclick="marcarVencimentoPago('${v.id}')">💰 Pagar</button>` : ''}
+                            <button class="btn-excluir" onclick="removerVencimento('${v.id}')">🗑️</button>
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
+    }
+
+    async function marcarVencimentoPago(id) {
+        if (confirm('Marcar este vencimento como PAGO?')) {
+            if (!db) db = await carregarDB();
+            const venc = db.vencimentos.find(v => v.id === id);
+            if (venc) {
+                venc.status = 'pago';
+                await salvarDB(db);
+                // Recarrega ambas as visualizações
+                carregarVencimentosAdmin();
+                if (usuarioAtual && usuarioAtual.tipo === 'cliente') {
+                    carregarVencimentosCliente();
+                }
+                alert('✅ Vencimento marcado como pago!');
+            }
+        }
     }
 
     async function removerVencimento(id) {
@@ -1871,6 +1914,9 @@
             db.vencimentos = db.vencimentos.filter(v => v.id !== id);
             await salvarDB(db);
             carregarVencimentosAdmin();
+            if (usuarioAtual && usuarioAtual.tipo === 'cliente') {
+                carregarVencimentosCliente();
+            }
         }
     }
 
@@ -1889,15 +1935,38 @@
 
         div.innerHTML = vencimentos.map(v => {
             const status = calcularStatusVencimento(v.dataVencimento);
+            const isPago = v.status === 'pago';
             return `
-                <div class="vencimento-card ${status.status}">
-                    <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong>
-                    <br><small>Competência: ${v.competencia}</small>
-                    <br><small>Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
-                    <br><span class="badge ${status.badge}">${status.label} - ${status.dias}</span>
+                <div class="vencimento-card ${status.status} ${isPago ? 'vencimento-pago' : ''}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                        <div>
+                            <strong style="font-size:0.9rem;">${tiposLabel[v.tipo] || v.tipo}</strong>
+                            <br><small>Competência: ${v.competencia}</small>
+                            <br><small>Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small>
+                            ${isPago ? '<br><span class="badge badge-pago">✅ PAGO</span>' : ''}
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="badge ${isPago ? 'badge-pago' : status.badge}">${isPago ? 'Pago' : status.label + ' - ' + status.dias}</span>
+                            <br>
+                            ${!isPago ? `<button class="btn-pagar" onclick="marcarVencimentoPagoCliente('${v.id}')">💰 Pagar</button>` : ''}
+                        </div>
+                    </div>
                 </div>
             `;
         }).join('');
+    }
+
+    async function marcarVencimentoPagoCliente(id) {
+        if (confirm('Marcar este vencimento como PAGO?')) {
+            if (!db) db = await carregarDB();
+            const venc = db.vencimentos.find(v => v.id === id);
+            if (venc) {
+                venc.status = 'pago';
+                await salvarDB(db);
+                carregarVencimentosCliente();
+                alert('✅ Vencimento marcado como pago!');
+            }
+        }
     }
 
     // ============ ATIVIDADES ============
@@ -2111,7 +2180,6 @@
     }
 
     // ============ INICIAR ============
-    // Aguarda o DOM carregar completamente antes de iniciar
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', inicializar);
     } else {
