@@ -80,7 +80,7 @@
 <div id="loadingOverlay" class="loading-overlay">
     <div style="text-align:center;">
         <i class="fas fa-spinner fa-spin" style="font-size:3rem; color:#0b3b5c;"></i>
-        <p style="margin-top:1rem; color:#0b3b5c;">Conectando...</p>
+        <p style="margin-top:1rem; color:#0b3b5c;">Carregando...</p>
     </div>
 </div>
 
@@ -138,13 +138,10 @@
         <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()">Sair</button>
     </div>
     <div class="admin-content">
-        <!-- NOTAS FISCAIS -->
         <div id="tabAdminNFs" class="card">
             <h3>📋 Notas Fiscais</h3>
             <div id="listaNFsAdmin"><p style="color:#7f8c8d;">📭 Nenhuma NF</p></div>
         </div>
-        
-        <!-- CLIENTES -->
         <div id="tabAdminClientes" class="card hidden">
             <h3>👥 Clientes</h3>
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
@@ -155,8 +152,6 @@
             <button class="btn-upload" onclick="adicionarCliente()">✅ Cadastrar Cliente</button>
             <div id="listaClientes" style="margin-top:1rem;"></div>
         </div>
-        
-        <!-- ATIVIDADES (REFORMULADO) -->
         <div id="tabAdminAtividades" class="card hidden">
             <h3>📝 Atividades</h3>
             <p style="color:#7f8c8d; margin-bottom:1rem;">Selecione um cliente para gerenciar as atividades.</p>
@@ -165,8 +160,6 @@
             </select>
             <div id="tabelaAtividades"><p style="color:#7f8c8d;">Selecione um cliente para ver as atividades.</p></div>
         </div>
-        
-        <!-- DOCUMENTOS -->
         <div id="tabAdminDocumentos" class="card hidden">
             <h3>📁 Adicionar Documento</h3>
             <select id="selectClienteDoc" style="margin-bottom:0.5rem;"><option value="">Cliente...</option></select>
@@ -175,8 +168,6 @@
             <input type="text" id="linkDocumento" placeholder="Link Google Drive" style="margin-bottom:0.5rem;">
             <button class="btn-upload" onclick="adicionarDocumento()">📤 Adicionar</button>
         </div>
-        
-        <!-- AGENDA -->
         <div id="tabAdminAgenda" class="card hidden">
             <h3>📅 Agenda Fiscal</h3>
             <select id="selectClienteVenc" style="margin-bottom:0.5rem;"><option value="">Cliente...</option></select>
@@ -190,8 +181,6 @@
             <button class="btn-upload" onclick="adicionarVencimento()">➕ Adicionar Vencimento</button>
             <div id="listaVencimentos" style="margin-top:1rem;"></div>
         </div>
-        
-        <!-- FATOR R -->
         <div id="tabAdminFatorR" class="card hidden">
             <h3>📊 Fator R</h3>
             <select id="selectClienteFator" onchange="carregarFatorR()" style="margin-bottom:0.5rem;"><option value="">Cliente...</option></select>
@@ -263,7 +252,6 @@
     const dbRef = firestore.collection('config').doc('principal');
     const clientesRef = firestore.collection('clientes');
 
-    // ============ VARIÁVEIS ============
     let usuarioAtual = null;
     let tipoLoginAtual = 'admin';
     let atividadeClienteAtual = null;
@@ -277,16 +265,9 @@
     ];
 
     function estruturaInicial() {
-        return { 
-            admin: { documento: '43751537848', senha: 'imperio1' }, 
-            notasFiscais: [], 
-            documentos: [], 
-            atividades: {}, 
-            vencimentos: [] 
-        };
+        return { admin: { documento: '43751537848', senha: 'imperio1' }, notasFiscais: [], documentos: [], atividades: {}, vencimentos: [] };
     }
 
-    // ============ CARREGAR/SALVAR ============
     async function carregarDB() {
         try {
             const doc = await dbRef.get();
@@ -298,40 +279,31 @@
     }
 
     async function salvarDB(dados) {
-        try { await dbRef.set(dados, { merge: true }); return true; } 
-        catch (e) { console.error('Erro:', e); return false; }
+        try { await dbRef.set(dados, { merge: true }); console.log('✅ Salvo no Firebase!'); return true; } 
+        catch (e) { console.error('❌ Erro:', e); alert('Erro ao salvar: ' + e.message); return false; }
     }
 
     async function carregarClientes() {
-        try { 
-            const snap = await clientesRef.get(); 
-            const c = {}; 
-            snap.forEach(d => c[d.id] = d.data()); 
-            return c; 
-        } catch (e) { return {}; }
+        try { const snap = await clientesRef.get(); const c = {}; snap.forEach(d => c[d.id] = d.data()); return c; } 
+        catch (e) { return {}; }
     }
 
     async function salvarCliente(doc, dados) {
         try { await clientesRef.doc(doc).set(dados); } catch (e) {}
     }
 
-    // ============ INICIALIZAR ============
     async function inicializar() {
         try {
             const db = await carregarDB();
             const clientes = await carregarClientes();
             if (!clientes['61521248000192']) {
-                await salvarCliente('61521248000192', { 
-                    nome: 'Woodwork', senha: 'Woodwork1', receitas: 12500, despesas: 4700,
-                    fatorR: { proLabore: 2800, faturamento12: 98000, folhaPagamento: 3500 } 
-                });
+                await salvarCliente('61521248000192', { nome: 'Woodwork', senha: 'Woodwork1', receitas: 12500, despesas: 4700, fatorR: { proLabore: 2800, faturamento12: 98000, folhaPagamento: 3500 } });
             }
         } catch (e) {}
         document.getElementById('loadingOverlay').style.display = 'none';
         mostrarTela('paginaInicial');
     }
 
-    // ============ NAVEGAÇÃO ============
     function mostrarTela(id) {
         document.querySelectorAll('#paginaInicial, #loginModal, #painelAdmin, #painelCliente').forEach(el => el.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
@@ -347,11 +319,9 @@
     function fecharLogin() { mostrarTela('paginaInicial'); }
     function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
 
-    // ============ LOGIN ============
     async function realizarLogin() {
         const doc = document.getElementById('inputDocumento').value.replace(/\D/g, '');
         const senha = document.getElementById('inputSenha').value;
-        
         const db = await carregarDB();
         const clientes = await carregarClientes();
         
@@ -374,7 +344,6 @@
         document.getElementById('loginErro').style.display = 'block';
     }
 
-    // ============ TABS ADMIN ============
     function alternarTabAdmin(tab, btn) {
         document.querySelectorAll('#painelAdmin .admin-tab').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
@@ -392,7 +361,6 @@
         if (tab === 'nfs') carregarNFsAdmin();
     }
 
-    // ============ TABS CLIENTE ============
     function alternarTabCliente(tab, btn) {
         document.querySelectorAll('#painelCliente .cliente-tab').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
@@ -404,7 +372,6 @@
         if (tab === 'dashboard') carregarDocumentosCliente();
     }
 
-    // ============ PAINEL ADMIN ============
     async function carregarPainelAdmin() {
         carregarNFsAdmin();
         carregarSelectAtividades();
@@ -449,7 +416,7 @@
         });
     }
 
-    // ============ ATIVIDADES (REFORMULADO) ============
+    // ============ ATIVIDADES ============
     async function carregarAtividades() {
         const doc = document.getElementById('selectClienteAtividade').value;
         const div = document.getElementById('tabelaAtividades');
@@ -474,7 +441,7 @@
             html += `<tr>
                 <td><strong>${ativ.nome}</strong></td>
                 <td><input type="date" id="data_${i}" value="${ativ.ultimaAtualizacao || ''}" style="width:150px;"></td>
-                <td><input type="text" id="obs_${i}" value="${ativ.obs || ''}" placeholder="Adicionar observação..."></td>
+                <td><input type="text" id="obs_${i}" value="${ativ.obs || ''}" placeholder="Observação..."></td>
                 <td><button class="btn-salvar" onclick="salvarAtividade(${i})">💾 Salvar</button></td>
             </tr>`;
         }
@@ -503,9 +470,7 @@
         const salvou = await salvarDB(db);
         
         if (salvou) {
-            alert('✅ Atividade salva com sucesso!');
-        } else {
-            alert('❌ Erro ao salvar! Verifique as regras do Firestore.');
+            alert('✅ Atividade salva!');
         }
     }
 
@@ -515,12 +480,7 @@
         const nome = document.getElementById('novoNome').value;
         const senha = document.getElementById('novaSenha').value;
         if (!doc || !nome || !senha) return alert('Preencha todos!');
-        
-        await salvarCliente(doc, { 
-            nome, senha, receitas: 0, despesas: 0,
-            fatorR: { proLabore: 0, faturamento12: 0, folhaPagamento: 0 } 
-        });
-        
+        await salvarCliente(doc, { nome, senha, receitas: 0, despesas: 0, fatorR: { proLabore: 0, faturamento12: 0, folhaPagamento: 0 } });
         alert('✅ Cliente cadastrado!');
         carregarListaClientes();
         carregarSelectAtividades();
@@ -538,29 +498,20 @@
         ).join('');
     }
 
-    // ============ NOTAS FISCAIS ============
+    // ============ NFs ============
     async function carregarNFsAdmin() {
         const db = await carregarDB();
         const div = document.getElementById('listaNFsAdmin');
         if (db.notasFiscais.length === 0) { div.innerHTML = '<p style="color:#7f8c8d;">📭 Nenhuma NF</p>'; return; }
         div.innerHTML = db.notasFiscais.map(nf => 
-            `<div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}">
-                <strong>${nf.produto}</strong> - R$ ${nf.valor} 
-                <span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span>
-            </div>`
+            `<div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}"><strong>${nf.produto}</strong> - R$ ${nf.valor} <span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span></div>`
         ).join('');
     }
 
     async function solicitarNF() {
         if (!usuarioAtual) return;
         const db = await carregarDB();
-        db.notasFiscais.push({
-            id: 'NF' + Date.now(),
-            clienteDoc: usuarioAtual.dados.documento,
-            produto: document.getElementById('nfProduto').value,
-            valor: document.getElementById('nfValor').value,
-            status: 'Pendente'
-        });
+        db.notasFiscais.push({ id: 'NF' + Date.now(), clienteDoc: usuarioAtual.dados.documento, produto: document.getElementById('nfProduto').value, valor: document.getElementById('nfValor').value, status: 'Pendente' });
         await salvarDB(db);
         alert('✅ NF solicitada!');
         carregarMinhasNFs();
@@ -582,7 +533,6 @@
         const nome = document.getElementById('nomeDocumento').value;
         const link = document.getElementById('linkDocumento').value;
         if (!clienteDoc || !nome || !link) return alert('Preencha!');
-        
         const db = await carregarDB();
         db.documentos.push({ id: 'DOC' + Date.now(), clienteDoc, tipo, nome, link });
         await salvarDB(db);
@@ -604,7 +554,6 @@
         const tipo = document.getElementById('tipoObrigacao').value;
         const competencia = document.getElementById('competenciaVenc').value;
         if (!clienteDoc || !competencia) return alert('Preencha!');
-        
         const db = await carregarDB();
         db.vencimentos.push({ id: 'V' + Date.now(), clienteDoc, tipo, competencia });
         await salvarDB(db);
@@ -635,11 +584,7 @@
         const clientes = await carregarClientes();
         const c = clientes[doc];
         const div = document.getElementById('placarFator');
-        div.innerHTML = `
-            <p><strong>Pró-Labore:</strong> R$ ${c.fatorR?.proLabore || 0}</p>
-            <p><strong>Faturamento 12m:</strong> R$ ${c.fatorR?.faturamento12 || 0}</p>
-            <p><strong>Folha Pagamento:</strong> R$ ${c.fatorR?.folhaPagamento || 0}</p>
-        `;
+        div.innerHTML = `<p><strong>Pró-Labore:</strong> R$ ${c.fatorR?.proLabore || 0}</p><p><strong>Faturamento 12m:</strong> R$ ${c.fatorR?.faturamento12 || 0}</p><p><strong>Folha:</strong> R$ ${c.fatorR?.folhaPagamento || 0}</p>`;
     }
 
     // ============ PAINEL CLIENTE ============
