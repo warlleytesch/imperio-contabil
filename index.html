@@ -6,10 +6,6 @@
     <title>Império Contábil | Contabilidade Inteligente</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK com carregamento otimizado -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    
     <style>
         /* ===== RESET E OTIMIZAÇÕES ===== */
         * {
@@ -24,7 +20,7 @@
         body {
             background: linear-gradient(135deg, #0b3b5c 0%, #1a5276 50%, #2c3e50 100%);
             min-height: 100vh;
-            min-height: 100dvh; /* Dynamic viewport height para mobile */
+            min-height: 100dvh;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -1309,6 +1305,11 @@
     </div>
 </div>
 
+<!-- ==================== FIREBASE E SCRIPTS ==================== -->
+<!-- Carregamento do Firebase com fallback -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
     // ============ CONFIGURAÇÃO FIREBASE ============
     const firebaseConfig = {
@@ -1320,7 +1321,14 @@
         appId: "1:571025656635:web:644093014d8079e5c4051e"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    // Inicializa o Firebase imediatamente
+    try {
+        firebase.initializeApp(firebaseConfig);
+        console.log('✅ Firebase inicializado');
+    } catch (e) {
+        console.error('❌ Erro ao inicializar Firebase:', e);
+    }
+    
     const firestore = firebase.firestore();
 
     // ============ LOGO ============
@@ -1332,6 +1340,7 @@
 
     let db = null;
     let usuarioAtual = null;
+    let sistemaInicializado = false;
     const ATIVIDADES_PADRAO = [
         { id: 'consultar_debitos', nome: 'Consulta de Débitos Anteriores', observacao: '', ultimaAtualizacao: '' },
         { id: 'emissao_nf', nome: 'Emissão de Notas Fiscais', observacao: '', ultimaAtualizacao: '' },
@@ -1394,21 +1403,37 @@
     }
 
     async function inicializar() {
+        // Evita inicialização duplicada
+        if (sistemaInicializado) return;
+        
         try {
+            console.log('🔄 Inicializando sistema...');
             db = await carregarDB();
             const clientes = await carregarClientes();
+            
+            // Cria cliente padrão se não existir
             if (!clientes['61521248000192']) {
                 await salvarCliente('61521248000192', {
-                    nome: 'Woodwork Estúdio', senha: 'Woodwork1', empresa: 'Woodwork Estúdio Ltda',
-                    receitas: 12500.00, despesas: 4700.00,
+                    nome: 'Woodwork Estúdio', 
+                    senha: 'Woodwork1', 
+                    empresa: 'Woodwork Estúdio Ltda',
+                    receitas: 12500.00, 
+                    despesas: 4700.00,
                     fatorR: { proLabore: 2800.00, faturamento12: 98000.00, folhaPagamento: 3500.00 }
                 });
+                console.log('✅ Cliente padrão criado');
             }
+            
+            sistemaInicializado = true;
             console.log('✅ Sistema pronto!');
         } catch (error) {
-            console.error('Erro init:', error);
+            console.error('❌ Erro na inicialização:', error);
+            // Mostra erro mas não trava a UI
         }
-        document.getElementById('loadingOverlay').style.display = 'none';
+        
+        // Remove o loading e mostra a página
+        const loading = document.getElementById('loadingOverlay');
+        if (loading) loading.style.display = 'none';
         mostrarTela('paginaInicial');
     }
 
@@ -1428,7 +1453,11 @@
     }
 
     function fecharLogin() { mostrarTela('paginaInicial'); }
-    async function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
+    
+    async function logout() { 
+        usuarioAtual = null; 
+        mostrarTela('paginaInicial'); 
+    }
 
     async function realizarLogin(event) {
         event.preventDefault();
@@ -1436,24 +1465,37 @@
         const doc = document.getElementById('inputDocumento').value.replace(/\D/g, '');
         const senha = document.getElementById('inputSenha').value;
         const erroDiv = document.getElementById('loginErro');
+        
+        // Garante que o DB está carregado
+        if (!db) db = await carregarDB();
+        
         try {
-            db = await carregarDB();
             const clientes = await carregarClientes();
             if (tipo === 'admin') {
                 if (doc === db.admin.documento && senha === db.admin.senha) {
                     usuarioAtual = { tipo: 'admin', dados: db.admin };
                     await carregarPainelAdmin();
                     mostrarTela('painelAdmin');
-                } else { erroDiv.textContent = 'Credenciais incorretas.'; erroDiv.style.display = 'block'; }
+                } else { 
+                    erroDiv.textContent = 'Credenciais incorretas.'; 
+                    erroDiv.style.display = 'block'; 
+                }
             } else {
                 const cliente = clientes[doc];
                 if (cliente && cliente.senha === senha) {
                     usuarioAtual = { tipo: 'cliente', dados: { ...cliente, documento: doc } };
                     await carregarPainelCliente();
                     mostrarTela('painelCliente');
-                } else { erroDiv.textContent = 'CPF/CNPJ ou senha incorretos.'; erroDiv.style.display = 'block'; }
+                } else { 
+                    erroDiv.textContent = 'CPF/CNPJ ou senha incorretos.'; 
+                    erroDiv.style.display = 'block'; 
+                }
             }
-        } catch (error) { erroDiv.textContent = 'Erro de conexão.'; erroDiv.style.display = 'block'; }
+        } catch (error) { 
+            erroDiv.textContent = 'Erro de conexão. Tente novamente.'; 
+            erroDiv.style.display = 'block'; 
+            console.error('Erro no login:', error);
+        }
     }
 
     function alternarTabAdmin(tab) {
@@ -1494,7 +1536,7 @@
     }
 
     async function carregarPainelAdmin() {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         carregarFiltroClientesNF();
         carregarSelectClientes('selectClienteDoc');
         carregarSelectClientes('selectClienteAtividade');
@@ -1514,7 +1556,7 @@
     }
 
     async function carregarTodasNFs() {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const filtro = document.getElementById('filtroClienteNF')?.value || '';
         let nfs = db.notasFiscais || [];
         if (filtro) nfs = nfs.filter(nf => nf.clienteDoc === filtro);
@@ -1545,14 +1587,14 @@
     }
 
     async function emitirNF(id) {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const nf = db.notasFiscais.find(n => n.id === id);
         if (nf) { nf.status = 'Emitida'; await salvarDB(db); carregarTodasNFs(); }
     }
 
     async function excluirNF(id) {
         if (confirm('Excluir esta nota fiscal?')) {
-            db = await carregarDB();
+            if (!db) db = await carregarDB();
             db.notasFiscais = db.notasFiscais.filter(n => n.id !== id);
             await salvarDB(db);
             carregarTodasNFs();
@@ -1636,7 +1678,7 @@
         }
 
         try {
-            db = await carregarDB();
+            if (!db) db = await carregarDB();
             if (!db.documentos) db.documentos = [];
             db.documentos.push({
                 id: 'DOC' + Date.now(),
@@ -1656,7 +1698,7 @@
 
     async function carregarDocumentosCliente() {
         if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const docsCliente = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
         const div = document.getElementById('documentosCliente');
         
@@ -1689,7 +1731,7 @@
     }
 
     async function carregarGerenciamentoDocs() {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const filtro = document.getElementById('filtroClienteDocs')?.value || '';
         let docs = db.documentos || [];
         if (filtro) docs = docs.filter(d => d.clienteDoc === filtro);
@@ -1728,7 +1770,7 @@
 
     async function marcarComoVisto(id) {
         if (confirm('Marcar documento como visualizado?')) {
-            db = await carregarDB();
+            if (!db) db = await carregarDB();
             const doc = (db.documentos || []).find(d => d.id === id);
             if (doc) {
                 doc.novo = false;
@@ -1741,7 +1783,7 @@
 
     async function excluirDocumento(id) {
         if (confirm('⚠️ Excluir este documento permanentemente?')) {
-            db = await carregarDB();
+            if (!db) db = await carregarDB();
             db.documentos = (db.documentos || []).filter(d => d.id !== id);
             await salvarDB(db);
             carregarGerenciamentoDocs();
@@ -1761,7 +1803,7 @@
         const [ano, mes] = competencia.split('-');
         const dataVencimento = new Date(parseInt(ano), parseInt(mes), 20);
 
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         if (!db.vencimentos) db.vencimentos = [];
 
         db.vencimentos.push({
@@ -1791,7 +1833,7 @@
     }
 
     async function carregarVencimentosAdmin() {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const vencimentos = db.vencimentos || [];
         const clientes = await carregarClientes();
         const div = document.getElementById('listaVencimentosAdmin');
@@ -1825,7 +1867,7 @@
 
     async function removerVencimento(id) {
         if (confirm('Remover este vencimento?')) {
-            db = await carregarDB();
+            if (!db) db = await carregarDB();
             db.vencimentos = db.vencimentos.filter(v => v.id !== id);
             await salvarDB(db);
             carregarVencimentosAdmin();
@@ -1834,7 +1876,7 @@
 
     async function carregarVencimentosCliente() {
         if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const vencimentos = (db.vencimentos || []).filter(v => v.clienteDoc === usuarioAtual.dados.documento);
         const div = document.getElementById('vencimentosCliente');
 
@@ -1860,7 +1902,7 @@
 
     // ============ ATIVIDADES ============
     async function inicializarAtividades(clienteDoc) {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         if (!db.atividades) db.atividades = {};
         if (!db.atividades[clienteDoc]) {
             db.atividades[clienteDoc] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
@@ -1904,7 +1946,7 @@
     }
 
     async function salvarAtividade(doc, index) {
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         if (!db.atividades[doc]) {
             await inicializarAtividades(doc);
             db = await carregarDB();
@@ -1964,7 +2006,7 @@
     // ============ NOTAS FISCAIS CLIENTE ============
     async function carregarMinhasNFs() {
         if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         const minhasNFs = (db.notasFiscais || []).filter(nf => nf.clienteDoc === usuarioAtual.dados.documento);
         const div = document.getElementById('minhasNotasFiscais');
         
@@ -1990,7 +2032,7 @@
 
     async function solicitarNF(event) {
         event.preventDefault();
-        db = await carregarDB();
+        if (!db) db = await carregarDB();
         db.notasFiscais.push({
             id: 'NF' + Date.now(),
             clienteDoc: usuarioAtual.dados.documento,
@@ -2069,7 +2111,12 @@
     }
 
     // ============ INICIAR ============
-    inicializar();
+    // Aguarda o DOM carregar completamente antes de iniciar
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', inicializar);
+    } else {
+        inicializar();
+    }
 </script>
 
 </body>
