@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Império Contábil | Contabilidade Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: linear-gradient(135deg, #0b3b5c 0%, #1a5276 50%, #2c3e50 100%); min-height: 100vh; }
+        .navbar { background: rgba(255,255,255,0.97); backdrop-filter: blur(10px); padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .logo { display: flex; align-items: center; gap: 16px; }
+        .logo-icon { width: 120px; height: 120px; border-radius: 0; display: flex; align-items: center; justify-content: center; overflow: visible; background: transparent; box-shadow: none; border: none; padding: 0; }
+        .logo-icon img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        .logo-text h1 { font-size: 1.8rem; font-weight: 700; color: #0b3b5c; line-height: 1.2; }
+        .logo-text span { font-size: 0.85rem; color: #5a7d9a; font-weight: 500; }
+        .btn-area-cliente { background: linear-gradient(135deg, #0b3b5c, #1a5276); color: white; padding: 0.75rem 1.8rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; box-shadow: 0 4px 12px rgba(11,59,92,0.3); border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-area-cliente:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11,59,92,0.4); }
+        .hero { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+        .hero-title { text-align: center; color: white; margin-bottom: 3rem; }
+        .hero-title h2 { font-size: 2.8rem; font-weight: 700; margin-bottom: 0.8rem; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .hero-title p { font-size: 1.2rem; opacity: 0.9; font-weight: 300; }
+        .mvv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; margin-bottom: 3rem; }
+        .card-mvv { background: white; padding: 2.2rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: all 0.3s; border-top: 5px solid #0b3b5c; }
+        .card-mvv:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .card-mvv .icon-circle { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #0b3b5c, #1a5276); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.2rem; }
+        .card-mvv h3 { font-size: 1.5rem; color: #0b3b5c; margin-bottom: 0.8rem; }
+        .card-mvv p { color: #5a6f7e; line-height: 1.7; font-size: 0.95rem; }
+        .contact-section { text-align: center; padding: 2rem 0; }
+        .contact-section h3 { color: white; font-size: 1.8rem; margin-bottom: 1.5rem; }
+        .social-buttons { display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; }
+        .btn-social { padding: 0.9rem 2rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 10px; transition: all 0.3s; color: white; }
+        .btn-whatsapp { background: #25D366; box-shadow: 0 5px 15px rgba(37,211,102,0.4); }
+        .btn-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); box-shadow: 0 5px 15px rgba(220,39,67,0.4); }
+        .btn-social:hover { transform: scale(1.05); }
+        .btn-admin-link { display: block; text-align: center; margin-top: 2rem; color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .btn-admin-link:hover { color: white; }
+        .hidden { display: none !important; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-box { background: white; border-radius: 24px; padding: 2.8rem; width: 90%; max-width: 440px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); position: relative; }
+        .login-box .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #95a5a6; background: none; border: none; }
+        .login-box h2 { text-align: center; color: #0b3b5c; margin-bottom: 0.5rem; font-size: 1.6rem; }
+        .login-box .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 2rem; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 0.4rem; font-size: 0.9rem; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #95a5a6; }
+        .input-wrapper input { width: 100%; padding: 0.9rem 0.9rem 0.9rem 2.8rem; border: 2px solid #e0e6ed; border-radius: 12px; font-size: 1rem; transition: 0.3s; }
+        .input-wrapper input:focus { outline: none; border-color: #0b3b5c; }
+        .btn-login-submit { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #0b3b5c, #1a5276); color: white; border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 600; cursor: pointer; margin-top: 0.8rem; transition: 0.3s; }
+        .btn-login-submit:hover { background: linear-gradient(135deg, #0d4a72, #1e5f85); }
+        .error-msg { background: #ffe0e0; color: #c0392b; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; display: none; font-size: 0.9rem; }
+        .admin-panel { background: #f0f4f8; min-height: 100vh; }
+        .admin-header { background: #0b1e2f; color: white; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .admin-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .admin-tab { padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); color: white; background: transparent; font-weight: 500; transition: 0.3s; font-size: 0.85rem; }
+        .admin-tab.active { background: white; color: #0b1e2f; border-color: white; }
+        .admin-content { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        .nf-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 3px 12px rgba(0,0,0,0.06); border-left: 5px solid #f39c12; }
+        .nf-card.emitida { border-left-color: #27ae60; }
+        .badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .badge-pendente { background: #fef3cd; color: #856404; }
+        .badge-concluido { background: #d4edda; color: #155724; }
+        .badge-andamento { background: #cce5ff; color: #004085; }
+        .badge-emitida { background: #d4edda; color: #155724; }
+        .badge-novo { background: #e74c3c; color: white; }
+        .badge-verde { background: #d4edda; color: #155724; }
+        .badge-amarelo { background: #fef3cd; color: #856404; }
+        .badge-vermelho { background: #f8d7da; color: #721c24; }
+        .badge-cinza { background: #e0e0e0; color: #333; }
+        .btn-emitir, .btn-status { background: #27ae60; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 0.5rem; margin-right: 0.3rem; }
+        .btn-excluir { background: #e74c3c; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        .btn-backup { background: #f39c12; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .btn-upload { background: #3498db; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 0.5rem; }
+        .btn-visto { background: #27ae60; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.06); font-size: 0.9rem; }
+        th { background: #0b1e2f; color: white; padding: 0.8rem; text-align: left; }
+        td { padding: 0.8rem; border-bottom: 1px solid #ecf0f1; vertical-align: top; }
+        .input-small { width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; }
+        .input-obs { width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; resize: vertical; }
+        .btn-salvar { background: #3498db; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+        .documento-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; background: #f8f9fa; border-radius: 8px; margin: 0.5rem 0; text-decoration: none; color: #2c3e50; transition: 0.3s; }
+        .documento-link:hover { background: #e8f4fd; }
+        .documento-link i { color: #e74c3c; font-size: 1.2rem; }
+        .documento-novo { background: #fff3cd; border: 2px solid #f39c12; }
+        .placar-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
+        .placar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .placar-item { background: #f0f4f8; padding: 1rem; border-radius: 10px; text-align: center; }
+        .placar-item .label { font-size: 0.8rem; color: #7f8c8d; }
+        .placar-item .valor { font-size: 1.3rem; font-weight: 700; color: #0b3b5c; }
+        .fator-r-badge { display: inline-block; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 700; font-size: 1.1rem; }
+        .fator-r-ok { background: #d4edda; color: #155724; }
+        .fator-r-alerta { background: #fef3cd; color: #856404; }
+        .fator-r-ruim { background: #f8d7da; color: #721c24; }
+        .cliente-panel { background: #f0f4f8; min-height: 100vh; }
+        .cliente-header { background: #0b1e2f; color: white; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .cliente-tabs { display: flex; gap: 0.5rem; }
+        .cliente-tab { padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); color: white; background: transparent; font-weight: 500; transition: 0.3s; font-size: 0.85rem; }
+        .cliente-tab.active { background: white; color: #0b1e2f; border-color: white; }
+        .cliente-content { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .dashboard-card { background: white; border-radius: 16px; padding: 1.8rem; margin-bottom: 1.5rem; box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
+        .saldo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .saldo-item { background: #eaf2f8; padding: 1.2rem; border-radius: 12px; text-align: center; }
+        .saldo-item .valor { font-size: 1.5rem; font-weight: 700; color: #0b3b5c; }
+        .saldo-item .rotulo { font-size: 0.8rem; color: #5a6f7e; }
+        .btn-solicitar { background: #0b3b5c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 0.8rem; }
+        .vencimento-card { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid #27ae60; }
+        .vencimento-card.alerta { border-left-color: #f39c12; }
+        .vencimento-card.critico { border-left-color: #e74c3c; }
+        .vencimento-card.vencido { border-left-color: #333; opacity: 0.7; }
+        .doc-card { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        textarea, select, input { width: 100%; padding: 0.7rem; border: 2px solid #e0e6ed; border-radius: 8px; margin: 0.4rem 0 0.8rem; font-size: 0.95rem; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; font-size: 1.5rem; color: #0b3b5c; }
+        .info-box { background: #e8f4fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; color: #0b3b5c; }
+        .competencia-badge { background: #0b3b5c; color: white; padding: 0.3rem 0.8rem; border-radius: 4px; font-weight: 600; font-size: 0.85rem; }
+        @media (max-width: 600px) { .saldo-grid, .placar-grid { grid-template-columns: 1fr; } .hero-title h2 { font-size: 2rem; } .logo-icon { width: 80px; height: 80px; } .logo-text h1 { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+
+<div id="loadingOverlay" class="loading-overlay">
+    <div style="text-align:center;">
+        <i class="fas fa-spinner fa-spin" style="font-size:3rem;"></i>
+        <p style="margin-top:1rem;">Conectando ao servidor...</p>
+    </div>
+</div>
+
+<!-- PÁGINA INICIAL -->
+<div id="paginaInicial">
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon" id="logoContainer"></div>
+            <div class="logo-text"><h1>Império Contábil</h1><span>Contabilidade estratégica</span></div>
+        </div>
+        <button class="btn-area-cliente" onclick="abrirLogin('cliente')"><i class="fas fa-lock"></i> Área do Cliente</button>
+    </nav>
+    <div class="hero">
+        <div class="hero-title"><h2>Sua contabilidade descomplicada</h2><p>Justiça tributária para pequenas e micro empresas brasileiras</p></div>
+        <div class="mvv-grid">
+            <div class="card-mvv"><div class="icon-circle"><i class="fas fa-bullseye"></i></div><h3>Missão</h3><p>Trazer justiça tributária para pequenas e micro empresas brasileiras, reduzindo seus custos com impostos e auxiliando em melhorias contra a burocracia.</p></div>
+            <div class="card-mvv"><div class="icon-circle"><i class="fas fa-eye"></i></div><h3>Visão</h3><p>Ser referência no atendimento prático e simples a todo tipo de empreendedor, principalmente a pequenas empresas e MEI.</p></div>
+            <div class="card-mvv"><div class="icon-circle"><i class="fas fa-handshake"></i></div><h3>Valores</h3><p>Respeito, honra e praticidade. Acreditamos que é possível descomplicar a burocracia para que o empreendedor se preocupe somente com suas vendas.</p></div>
+        </div>
+        <div class="contact-section">
+            <h3>Fale Conosco</h3>
+            <div class="social-buttons">
+                <a href="https://wa.me/5511999999999" class="btn-social btn-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Business</a>
+                <a href="https://instagram.com/imperiocontabil" class="btn-social btn-instagram" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+            </div>
+        </div>
+        <a href="#" class="btn-admin-link" onclick="abrirLogin('admin')"><i class="fas fa-crown"></i> Acesso Administrativo</a>
+    </div>
+</div>
+
+<!-- MODAL DE LOGIN -->
+<div id="loginModal" class="login-overlay hidden">
+    <div class="login-box">
+        <button class="close-btn" onclick="fecharLogin()">✕</button>
+        <h2 id="loginTitulo">Acessar Painel</h2>
+        <p class="subtitle" id="loginSubtitulo">Digite suas credenciais</p>
+        <div class="error-msg" id="loginErro"></div>
+        <form id="formLogin" onsubmit="realizarLogin(event)">
+            <div class="form-group"><label>CPF ou CNPJ</label><div class="input-wrapper"><i class="fas fa-id-card"></i><input type="text" id="inputDocumento" placeholder="Apenas números" required></div></div>
+            <div class="form-group"><label>Senha</label><div class="input-wrapper"><i class="fas fa-key"></i><input type="password" id="inputSenha" placeholder="Sua senha" required></div></div>
+            <button type="submit" class="btn-login-submit">Entrar</button>
+        </form>
+    </div>
+</div>
+
+<!-- PAINEL ADMIN -->
+<div id="painelAdmin" class="admin-panel hidden">
+    <div class="admin-header">
+        <h2><i class="fas fa-crown"></i> Painel Administrativo</h2>
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="alternarTabAdmin('nfs')">📋 NF</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('clientes')">👥 Clientes</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('atividades')">📝 Atividades</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('documentos')">📁 Docs</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('gerenciarDocs')">🗂️ Gerir Docs</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('agenda')">📅 Agenda</button>
+            <button class="admin-tab" onclick="alternarTabAdmin('fatorR')">📊 Fator R</button>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+            <button class="btn-backup" onclick="exportarBackup()">📥</button>
+            <button class="btn-backup" onclick="document.getElementById('inputImportar').click()">📤</button>
+            <input type="file" id="inputImportar" accept=".json" style="display:none;" onchange="importarBackup(event)">
+            <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </div>
+    <div class="admin-content">
+        <div id="tabNFs">
+            <h3 style="margin-bottom:1rem;">📋 Todas as Notas Fiscais</h3>
+            <div style="margin-bottom:1rem;"><label style="font-weight:600;">Filtrar por cliente:</label><select id="filtroClienteNF" onchange="carregarTodasNFs()" style="width:auto; min-width:250px;"><option value="">Todos os clientes</option></select></div>
+            <div id="listaNotasFiscais"><p style="color:#7f8c8d; text-align:center; padding:2rem;">📭 Nenhuma nota fiscal.</p></div>
+        </div>
+        <div id="tabClientes" class="hidden">
+            <h3 style="margin-bottom:1rem;">👥 Gerenciar Clientes</h3>
+            <div style="background:white; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+                <h4 style="margin-bottom:1rem;">➕ Novo Cliente</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div><label style="font-weight:600;">CPF/CNPJ</label><input type="text" id="novoDoc" class="input-small"></div>
+                    <div><label style="font-weight:600;">Nome</label><input type="text" id="novoNome" class="input-small"></div>
+                    <div><label style="font-weight:600;">Senha</label><input type="text" id="novaSenha" class="input-small"></div>
+                    <div><label style="font-weight:600;">Receitas (R$)</label><input type="number" id="novaReceita" value="0" step="0.01" class="input-small"></div>
+                    <div><label style="font-weight:600;">Despesas (R$)</label><input type="number" id="novaDespesa" value="0" step="0.01" class="input-small"></div>
+                    <div style="display:flex; align-items:end;"><button class="btn-salvar" onclick="adicionarCliente()" style="width:100%; padding:0.6rem;">✅ Cadastrar</button></div>
+                </div>
+            </div>
+            <h4 style="margin-bottom:0.5rem;">📋 Clientes</h4>
+            <div id="tabelaClientes"></div>
+        </div>
+        <div id="tabAtividades" class="hidden">
+            <h3 style="margin-bottom:1rem;">📝 Controle de Atividades por Competência</h3>
+            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+                    <div><label style="font-weight:600;">Cliente</label><select id="selectClienteAtividade" onchange="carregarAtividades()"><option value="">Escolha...</option></select></div>
+                    <div><label style="font-weight:600;">Competência (Mês/Ano)</label><input type="month" id="filtroCompetenciaAtividade" onchange="carregarAtividades()"></div>
+                </div>
+                <div id="tabelaAtividades"><p style="color:#7f8c8d; padding:1rem; text-align:center;">👆 Selecione um cliente e uma competência.</p></div>
+            </div>
+        </div>
+        <div id="tabDocumentos" class="hidden">
+            <h3 style="margin-bottom:1rem;">📁 Adicionar Documento (Google Drive)</h3>
+            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+                <div class="info-box"><strong>📌 Como fazer:</strong><br>1. Suba o PDF no Google Drive<br>2. Clique direito → Compartilhar<br>3. "Qualquer pessoa com o link"<br>4. Copie o link e cole abaixo</div>
+                <div class="form-group"><label>Cliente</label><select id="selectClienteDoc"><option value="">Escolha...</option></select></div>
+                <div class="form-group"><label>Tipo</label><select id="tipoDocumento"><option value="das">DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option><option value="extrato">Extrato</option><option value="outro">Outro</option></select></div>
+                <div class="form-group"><label>Nome</label><input type="text" id="nomeDocumento" placeholder="Ex: DAS - Competência 08/2024"></div>
+                <div class="form-group"><label>Link Google Drive</label><input type="url" id="linkDocumento" placeholder="https://drive.google.com/file/d/..."></div>
+                <button class="btn-upload" onclick="adicionarDocumentoDrive()" style="width:100%;">📤 Adicionar Documento</button>
+            </div>
+        </div>
+        <div id="tabGerenciarDocs" class="hidden">
+            <h3 style="margin-bottom:1rem;">🗂️ Gerenciar Documentos</h3>
+            <div style="margin-bottom:1rem;"><label style="font-weight:600;">Filtrar por cliente:</label><select id="filtroClienteDocs" onchange="carregarGerenciamentoDocs()" style="width:auto; min-width:250px;"><option value="">Todos os clientes</option></select></div>
+            <div id="listaGerenciarDocs"><p style="color:#7f8c8d; text-align:center; padding:2rem;">📭 Nenhum documento.</p></div>
+        </div>
+        <div id="tabAgenda" class="hidden">
+            <h3 style="margin-bottom:1rem;">📅 Agenda de Obrigações Fiscais</h3>
+            <div style="background:white; border-radius:12px; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+                <h4 style="margin-bottom:1rem;">➕ Adicionar Vencimento</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+                    <div><label style="font-weight:600;">Cliente</label><select id="selectClienteVencimento"><option value="">Escolha...</option></select></div>
+                    <div><label style="font-weight:600;">Obrigação</label><select id="tipoObrigacao" onchange="atualizarInfoVencimento()"><option value="das">DAS</option><option value="parcelamento_das">Parcelamento DAS</option><option value="inss">INSS/GPS</option><option value="dctfweb">DCTFWeb</option></select></div>
+                    <div><label style="font-weight:600;">Competência</label><input type="month" id="competenciaObrigacao"></div>
+                </div>
+                <div id="infoVencimento" style="display:none; background:#fef3cd; padding:0.8rem; border-radius:8px; margin-top:0.5rem; font-size:0.85rem; color:#856404;">⚠️ Parcelamento DAS vence no ÚLTIMO dia do mês de competência.</div>
+                <button class="btn-upload" onclick="adicionarVencimento()" style="width:100%; margin-top:1rem;">➕ Adicionar Vencimento</button>
+            </div>
+            <div id="listaVencimentosAdmin"></div>
+        </div>
+        <div id="tabFatorR" class="hidden">
+            <h3 style="margin-bottom:1rem;">📊 Placar Fator R</h3>
+            <div style="background:white; border-radius:12px; padding:1.5rem; box-shadow:0 3px 12px rgba(0,0,0,0.06);">
+                <label style="font-weight:600;">Cliente</label><select id="selectClienteFatorR" onchange="carregarFatorR()"><option value="">Escolha...</option></select>
+                <div id="placarFatorR"><p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PAINEL CLIENTE -->
+<div id="painelCliente" class="cliente-panel hidden">
+    <div class="cliente-header">
+        <h2><i class="fas fa-user"></i> <span id="nomeClienteHeader"></span></h2>
+        <div class="cliente-tabs">
+            <button class="cliente-tab active" onclick="alternarTabCliente('dashboard')">📊 Dashboard</button>
+            <button class="cliente-tab" onclick="alternarTabCliente('notas')">📝 Notas Fiscais</button>
+            <button class="cliente-tab" onclick="alternarTabCliente('agenda')">📅 Vencimentos</button>
+        </div>
+        <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+    <div class="cliente-content">
+        <div id="tabClienteDashboard">
+            <div class="dashboard-card"><h3>📊 Dashboard Financeiro</h3><div class="saldo-grid"><div class="saldo-item"><div class="rotulo">Receitas</div><div class="valor" id="recCliente">R$ 0,00</div></div><div class="saldo-item"><div class="rotulo">Despesas</div><div class="valor" id="despCliente">R$ 0,00</div></div><div class="saldo-item"><div class="rotulo">Saldo</div><div class="valor" id="saldoCliente">R$ 0,00</div></div></div></div>
+            <div class="dashboard-card"><h3>📁 Meus Documentos</h3><div id="documentosCliente"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhum documento.</p></div></div>
+        </div>
+        <div id="tabClienteNotas" class="hidden">
+            <div class="dashboard-card">
+                <h3>📝 Solicitar Emissão de Nota Fiscal</h3>
+                <form id="formSolicitarNF" onsubmit="solicitarNF(event)">
+                    <label>Valor (R$)</label><input type="number" id="nfValor" step="0.01" required>
+                    <label>Produto/Serviço</label><input type="text" id="nfProduto" required>
+                    <label>Pagamento</label><select id="nfPagamento"><option>PIX</option><option>Boleto</option><option>Cartão</option></select>
+                    <label>Nome do Tomador</label><input type="text" id="nfNomeTomador" required>
+                    <label>CPF/CNPJ do Tomador</label><input type="text" id="nfDocTomador" required>
+                    <label>Endereço</label><input type="text" id="nfEndereco" required>
+                    <button type="submit" class="btn-solicitar"><i class="fas fa-paper-plane"></i> Solicitar NF</button>
+                </form>
+            </div>
+            <div class="dashboard-card"><h3>📋 Minhas Notas Fiscais</h3><div id="minhasNotasFiscais"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhuma nota fiscal.</p></div></div>
+        </div>
+        <div id="tabClienteAgenda" class="hidden">
+            <div class="dashboard-card"><h3>📅 Próximos Vencimentos</h3><div id="vencimentosCliente"><p style="color:#7f8c8d; padding:1rem;">📭 Nenhum vencimento.</p></div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============ CONFIGURAÇÃO FIREBASE ============
+    const firebaseConfig = {
+        apiKey: "AIzaSyASTggOY9t3J3wdXDg5ZNC1E8u5s2dE7qQ",
+        authDomain: "imperio-contabil-1b82e.firebaseapp.com",
+        projectId: "imperio-contabil-1b82e",
+        storageBucket: "imperio-contabil-1b82e.firebasestorage.app",
+        messagingSenderId: "571025656635",
+        appId: "1:571025656635:web:644093014d8079e5c4051e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const firestore = firebase.firestore();
+
+    // ============ LOGO ============
+    const LOGO_URL = 'https://i.ibb.co/YFgf5SbT/logo.png';
+    document.getElementById('logoContainer').innerHTML = `<img src="${LOGO_URL}" alt="Império Contábil" style="width:100%; height:100%; object-fit:contain;">`;
+
+    const dbRef = firestore.collection('config').doc('principal');
+    const clientesRef = firestore.collection('clientes');
+
+    let db = null;
+    let usuarioAtual = null;
+    
+    const ATIVIDADES_PADRAO = [
+        { id: 'consultar_debitos', nome: 'Consulta de Débitos Anteriores', status: 'pendente', dataConclusao: '', obs: '' },
+        { id: 'emissao_nf', nome: 'Emissão de Notas Fiscais', status: 'pendente', dataConclusao: '', obs: '' },
+        { id: 'dctfweb', nome: 'Transmissão DCTFWeb', status: 'pendente', dataConclusao: '', obs: '' },
+        { id: 'calculo_das', nome: 'Cálculo DAS', status: 'pendente', dataConclusao: '', obs: '' },
+        { id: 'conciliacao', nome: 'Conciliação Bancária', status: 'pendente', dataConclusao: '', obs: '' }
+    ];
+
+    // Contexto global para atividades
+    let atividadeContexto = {
+        clienteDoc: null,
+        competencia: null
+    };
+
+    function estruturaInicial() {
+        return { admin: { documento: '43751537848', senha: 'imperio1', nome: 'Administrador' }, notasFiscais: [], documentos: [], atividades: {}, vencimentos: [] };
+    }
+
+    async function carregarDB() {
+        try {
+            const doc = await dbRef.get();
+            if (doc.exists && doc.data().admin) return doc.data();
+            const inicial = estruturaInicial();
+            await dbRef.set(inicial);
+            return inicial;
+        } catch (error) { console.error('Erro DB:', error); return estruturaInicial(); }
+    }
+
+    async function salvarDB(dados) {
+        try { await dbRef.set(dados, { merge: true }); console.log('✅ DB salvo!'); } 
+        catch (error) { console.error('❌ Erro ao salvar:', error); alert('Erro ao salvar!'); }
+    }
+
+    async function carregarClientes() {
+        try { const snapshot = await clientesRef.get(); const clientes = {}; snapshot.forEach(doc => clientes[doc.id] = doc.data()); return clientes; } 
+        catch (error) { return {}; }
+    }
+
+    async function salvarCliente(doc, dados) { try { await clientesRef.doc(doc).set(dados); } catch (error) {} }
+    async function deletarCliente(doc) { try { await clientesRef.doc(doc).delete(); } catch (error) {} }
+
+    async function inicializar() {
+        try {
+            db = await carregarDB();
+            const clientes = await carregarClientes();
+            if (!clientes['61521248000192']) {
+                await salvarCliente('61521248000192', { nome: 'Woodwork Estúdio', senha: 'Woodwork1', empresa: 'Woodwork Estúdio Ltda', receitas: 12500.00, despesas: 4700.00, fatorR: { proLabore: 2800.00, faturamento12: 98000.00, folhaPagamento: 3500.00 } });
+            }
+        } catch (error) {}
+        document.getElementById('loadingOverlay').style.display = 'none';
+        mostrarTela('paginaInicial');
+    }
+
+    function mostrarTela(id) {
+        document.querySelectorAll('#paginaInicial, #loginModal, #painelAdmin, #painelCliente').forEach(el => el.classList.add('hidden'));
+        const tela = document.getElementById(id);
+        if (tela) tela.classList.remove('hidden');
+    }
+
+    function abrirLogin(tipo) {
+        document.getElementById('loginTitulo').textContent = tipo === 'admin' ? 'Acesso Administrativo' : 'Acesso do Cliente';
+        document.getElementById('loginSubtitulo').textContent = tipo === 'admin' ? 'Área restrita' : 'Digite seu CPF/CNPJ e senha';
+        document.getElementById('loginErro').style.display = 'none';
+        document.getElementById('formLogin').reset();
+        document.getElementById('formLogin').dataset.tipo = tipo;
+        mostrarTela('loginModal');
+    }
+
+    function fecharLogin() { mostrarTela('paginaInicial'); }
+    async function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
+
+    async function realizarLogin(event) {
+        event.preventDefault();
+        const tipo = document.getElementById('formLogin').dataset.tipo;
+        const doc = document.getElementById('inputDocumento').value.replace(/\D/g, '');
+        const senha = document.getElementById('inputSenha').value;
+        const erroDiv = document.getElementById('loginErro');
+        try {
+            db = await carregarDB();
+            const clientes = await carregarClientes();
+            if (tipo === 'admin') {
+                if (doc === db.admin.documento && senha === db.admin.senha) { usuarioAtual = { tipo: 'admin' }; await carregarPainelAdmin(); mostrarTela('painelAdmin'); }
+                else { erroDiv.textContent = 'Credenciais incorretas.'; erroDiv.style.display = 'block'; }
+            } else {
+                const cliente = clientes[doc];
+                if (cliente && cliente.senha === senha) { usuarioAtual = { tipo: 'cliente', dados: { ...cliente, documento: doc } }; await carregarPainelCliente(); mostrarTela('painelCliente'); }
+                else { erroDiv.textContent = 'CPF/CNPJ ou senha incorretos.'; erroDiv.style.display = 'block'; }
+            }
+        } catch (error) { erroDiv.textContent = 'Erro de conexão.'; erroDiv.style.display = 'block'; }
+    }
+
+    function alternarTabAdmin(tab) {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tabNFs').classList.toggle('hidden', tab !== 'nfs');
+        document.getElementById('tabClientes').classList.toggle('hidden', tab !== 'clientes');
+        document.getElementById('tabAtividades').classList.toggle('hidden', tab !== 'atividades');
+        document.getElementById('tabDocumentos').classList.toggle('hidden', tab !== 'documentos');
+        document.getElementById('tabGerenciarDocs').classList.toggle('hidden', tab !== 'gerenciarDocs');
+        document.getElementById('tabAgenda').classList.toggle('hidden', tab !== 'agenda');
+        document.getElementById('tabFatorR').classList.toggle('hidden', tab !== 'fatorR');
+        if (tab === 'clientes') carregarTabelaClientes();
+        if (tab === 'atividades') carregarSelectClientes('selectClienteAtividade');
+        if (tab === 'documentos') carregarSelectClientes('selectClienteDoc');
+        if (tab === 'gerenciarDocs') { carregarFiltroDocs(); carregarGerenciamentoDocs(); }
+        if (tab === 'agenda') { carregarSelectClientes('selectClienteVencimento'); carregarVencimentosAdmin(); }
+        if (tab === 'fatorR') carregarSelectClientes('selectClienteFatorR');
+        if (tab === 'nfs') carregarFiltroClientesNF();
+    }
+
+    function alternarTabCliente(tab) {
+        document.querySelectorAll('.cliente-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('tabClienteDashboard').classList.toggle('hidden', tab !== 'dashboard');
+        document.getElementById('tabClienteNotas').classList.toggle('hidden', tab !== 'notas');
+        document.getElementById('tabClienteAgenda').classList.toggle('hidden', tab !== 'agenda');
+        if (tab === 'notas') carregarMinhasNFs();
+        if (tab === 'agenda') carregarVencimentosCliente();
+        if (tab === 'dashboard') carregarDocumentosCliente();
+    }
+
+    async function carregarPainelAdmin() {
+        db = await carregarDB();
+        carregarFiltroClientesNF();
+        carregarSelectClientes('selectClienteDoc');
+        carregarSelectClientes('selectClienteAtividade');
+        carregarSelectClientes('selectClienteFatorR');
+        carregarSelectClientes('selectClienteVencimento');
+        carregarFiltroDocs();
+    }
+
+    async function carregarFiltroClientesNF() {
+        const clientes = await carregarClientes();
+        const select = document.getElementById('filtroClienteNF');
+        select.innerHTML = '<option value="">Todos os clientes</option>';
+        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome} (${doc})</option>`; });
+        carregarTodasNFs();
+    }
+
+    async function carregarTodasNFs() {
+        db = await carregarDB();
+        const filtro = document.getElementById('filtroClienteNF')?.value || '';
+        let nfs = db.notasFiscais || [];
+        if (filtro) nfs = nfs.filter(nf => nf.clienteDoc === filtro);
+        const container = document.getElementById('listaNotasFiscais');
+        if (nfs.length === 0) { container.innerHTML = '<p style="color:#7f8c8d; text-align:center; padding:2rem;">📭 Nenhuma nota fiscal.</p>'; return; }
+        nfs.sort((a, b) => b.id.localeCompare(a.id));
+        container.innerHTML = nfs.map(nf => `<div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}"><div style="display:flex; justify-content:space-between; flex-wrap:wrap;"><div style="flex:1;"><h4>NF #${nf.id} - ${nf.produto}</h4><p><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | ${nf.pagamento}</p><p><strong>Solicitante:</strong> ${nf.clienteNome}</p><p><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p><p>${nf.data}</p></div><div style="text-align:right;"><span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span>${nf.status === 'Pendente' ? `<br><button class="btn-emitir" onclick="emitirNF('${nf.id}')">✅ Emitir</button>` : ''}<br><button class="btn-excluir" onclick="excluirNF('${nf.id}')">🗑️</button></div></div></div>`).join('');
+    }
+
+    async function emitirNF(id) { db = await carregarDB(); const nf = db.notasFiscais.find(n => n.id === id); if (nf) { nf.status = 'Emitida'; await salvarDB(db); carregarTodasNFs(); } }
+    async function excluirNF(id) { if (confirm('Excluir?')) { db = await carregarDB(); db.notasFiscais = db.notasFiscais.filter(n => n.id !== id); await salvarDB(db); carregarTodasNFs(); } }
+
+    async function adicionarCliente() {
+        const doc = document.getElementById('novoDoc').value.replace(/\D/g, '');
+        const nome = document.getElementById('novoNome').value;
+        const senha = document.getElementById('novaSenha').value;
+        const receitas = parseFloat(document.getElementById('novaReceita').value) || 0;
+        const despesas = parseFloat(document.getElementById('novaDespesa').value) || 0;
+        if (!doc || !nome || !senha) return alert('Preencha todos!');
+        await salvarCliente(doc, { nome, senha, empresa: nome, receitas, despesas, fatorR: { proLabore: 0, faturamento12: 0, folhaPagamento: 0 } });
+        alert(`✅ ${nome} cadastrado!`);
+        ['novoDoc','novoNome','novaSenha','novaReceita','novaDespesa'].forEach(id => document.getElementById(id).value = '');
+        carregarTabelaClientes();
+    }
+
+    async function atualizarCliente(doc) {
+        const clientes = await carregarClientes();
+        const c = clientes[doc];
+        if (!c) return;
+        c.receitas = parseFloat(document.getElementById(`rec_${doc}`).value) || 0;
+        c.despesas = parseFloat(document.getElementById(`desp_${doc}`).value) || 0;
+        await salvarCliente(doc, c);
+        alert('✅ Atualizado!');
+    }
+
+    async function removerCliente(doc) { if (confirm('Excluir?')) { await deletarCliente(doc); carregarTabelaClientes(); } }
+
+    async function carregarTabelaClientes() {
+        const clientes = await carregarClientes();
+        const div = document.getElementById('tabelaClientes');
+        const docs = Object.keys(clientes);
+        if (docs.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; padding:2rem;">Nenhum cliente.</p>'; return; }
+        let html = '<table><thead><tr><th>CPF/CNPJ</th><th>Nome</th><th>Senha</th><th>Receitas</th><th>Despesas</th><th>Ações</th></tr></thead><tbody>';
+        docs.forEach(doc => { const c = clientes[doc]; html += `<tr><td>${doc}</td><td>${c.nome}</td><td>${c.senha}</td><td><input type="number" id="rec_${doc}" value="${c.receitas}" step="0.01" class="input-small" style="width:100px;"></td><td><input type="number" id="desp_${doc}" value="${c.despesas}" step="0.01" class="input-small" style="width:100px;"></td><td><button class="btn-salvar" onclick="atualizarCliente('${doc}')">💾</button> <button class="btn-excluir" onclick="removerCliente('${doc}')">🗑️</button></td></tr>`; });
+        html += '</tbody></table>';
+        div.innerHTML = html;
+    }
+
+    async function carregarSelectClientes(selectId) {
+        const clientes = await carregarClientes();
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.innerHTML = '<option value="">Escolha um cliente...</option>';
+        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome} (${doc})</option>`; });
+    }
+
+    // ============ DOCUMENTOS ============
+    async function adicionarDocumentoDrive() {
+        const clienteDoc = document.getElementById('selectClienteDoc').value;
+        const tipo = document.getElementById('tipoDocumento').value;
+        const nome = document.getElementById('nomeDocumento').value;
+        const link = document.getElementById('linkDocumento').value;
+        if (!clienteDoc || !nome || !link) return alert('Preencha todos!');
+        if (!link.includes('drive.google.com')) return alert('Link deve ser do Google Drive!');
+        let linkDownload = link;
+        const matchId = link.match(/\/d\/([^/]+)/);
+        if (matchId) linkDownload = `https://drive.google.com/uc?export=download&id=${matchId[1]}`;
+        db = await carregarDB();
+        if (!db.documentos) db.documentos = [];
+        db.documentos.push({ id: 'DOC' + Date.now(), clienteDoc, tipo, nome, link: linkDownload, data: new Date().toLocaleDateString('pt-BR'), novo: true });
+        await salvarDB(db);
+        alert('✅ Documento adicionado!');
+        document.getElementById('nomeDocumento').value = '';
+        document.getElementById('linkDocumento').value = '';
+    }
+
+    async function carregarDocumentosCliente() {
+        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
+        db = await carregarDB();
+        const docsCliente = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('documentosCliente');
+        if (docsCliente.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📭 Nenhum documento.</p>'; return; }
+        div.innerHTML = docsCliente.map(doc => `<div class="doc-card ${doc.novo ? 'documento-novo' : ''}"><div style="display:flex; justify-content:space-between; flex-wrap:wrap;"><div><a href="${doc.link}" target="_blank" style="text-decoration:none; color:#2c3e50;"><i class="fas fa-file-pdf" style="color:#e74c3c;"></i> <strong>${doc.nome}</strong></a> ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : '<span class="badge badge-verde">Visto</span>'}<br><small>${doc.tipo.toUpperCase()} - ${doc.data}</small></div><div>${doc.novo ? `<button class="btn-visto" onclick="clienteMarcarVisto('${doc.id}')">✅ Marcar como visto</button>` : ''}</div></div></div>`).join('');
+    }
+
+    async function clienteMarcarVisto(id) {
+        db = await carregarDB();
+        const doc = (db.documentos || []).find(d => d.id === id);
+        if (doc) { doc.novo = false; await salvarDB(db); carregarDocumentosCliente(); }
+    }
+
+    // ============ GERENCIAR DOCS ============
+    async function carregarFiltroDocs() {
+        const clientes = await carregarClientes();
+        const select = document.getElementById('filtroClienteDocs');
+        select.innerHTML = '<option value="">Todos os clientes</option>';
+        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome} (${doc})</option>`; });
+    }
+
+    async function carregarGerenciamentoDocs() {
+        db = await carregarDB();
+        const filtro = document.getElementById('filtroClienteDocs')?.value || '';
+        let docs = db.documentos || [];
+        if (filtro) docs = docs.filter(d => d.clienteDoc === filtro);
+        const clientes = await carregarClientes();
+        const div = document.getElementById('listaGerenciarDocs');
+        if (docs.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; text-align:center; padding:2rem;">📭 Nenhum documento.</p>'; return; }
+        div.innerHTML = docs.map(doc => { const cliente = clientes[doc.clienteDoc] || { nome: 'Cliente não encontrado' }; return `<div class="doc-card"><div style="display:flex; justify-content:space-between; flex-wrap:wrap;"><div><strong>📄 ${doc.nome}</strong> ${doc.novo ? '<span class="badge badge-novo">NOVO</span>' : '<span class="badge badge-verde">Visualizado</span>'}<br><small>${cliente.nome} | ${doc.tipo.toUpperCase()} | ${doc.data}</small></div><div><a href="${doc.link}" target="_blank" style="color:#3498db;">🔗 Abrir</a> <button class="btn-salvar" onclick="marcarComoVisto('${doc.id}')">✅</button> <button class="btn-excluir" onclick="excluirDocumento('${doc.id}')">🗑️</button></div></div></div>`; }).join('');
+    }
+
+    async function marcarComoVisto(id) { db = await carregarDB(); const doc = (db.documentos || []).find(d => d.id === id); if (doc) { doc.novo = false; await salvarDB(db); carregarGerenciamentoDocs(); } }
+    async function excluirDocumento(id) { if (confirm('Excluir?')) { db = await carregarDB(); db.documentos = (db.documentos || []).filter(d => d.id !== id); await salvarDB(db); carregarGerenciamentoDocs(); } }
+
+    // ============ VENCIMENTOS ============
+    function atualizarInfoVencimento() {
+        const tipo = document.getElementById('tipoObrigacao').value;
+        const info = document.getElementById('infoVencimento');
+        if (tipo === 'parcelamento_das') { info.style.display = 'block'; info.textContent = '⚠️ Parcelamento DAS vence no ÚLTIMO dia do mês de competência.'; } else { info.style.display = 'none'; }
+    }
+
+    async function adicionarVencimento() {
+        const clienteDoc = document.getElementById('selectClienteVencimento').value;
+        const tipo = document.getElementById('tipoObrigacao').value;
+        const competencia = document.getElementById('competenciaObrigacao').value;
+        if (!clienteDoc || !competencia) return alert('Preencha todos!');
+        const [ano, mes] = competencia.split('-');
+        let dataVencimento;
+        if (tipo === 'parcelamento_das') { const ultimoDia = new Date(parseInt(ano), parseInt(mes), 0).getDate(); dataVencimento = new Date(parseInt(ano), parseInt(mes) - 1, ultimoDia); } else { dataVencimento = new Date(parseInt(ano), parseInt(mes), 20); }
+        db = await carregarDB();
+        if (!db.vencimentos) db.vencimentos = [];
+        db.vencimentos.push({ id: 'VENC' + Date.now(), clienteDoc, tipo, competencia, dataVencimento: dataVencimento.toISOString(), status: 'pendente' });
+        await salvarDB(db);
+        alert('✅ Vencimento cadastrado!');
+        document.getElementById('competenciaObrigacao').value = '';
+        carregarVencimentosAdmin();
+    }
+
+    function calcularStatusVencimento(dataVencimento) {
+        const hoje = new Date(); const venc = new Date(dataVencimento);
+        hoje.setHours(0,0,0,0); venc.setHours(0,0,0,0);
+        const diffDias = Math.ceil((venc - hoje) / (1000*60*60*24));
+        if (diffDias < 0) return { status: 'vencido', label: 'Vencido', badge: 'badge-cinza', dias: Math.abs(diffDias) + 'd atrasado' };
+        if (diffDias <= 2) return { status: 'critico', label: 'Crítico', badge: 'badge-vermelho', dias: diffDias + 'd restantes' };
+        if (diffDias <= 5) return { status: 'alerta', label: 'Alerta', badge: 'badge-amarelo', dias: diffDias + 'd restantes' };
+        return { status: 'ok', label: 'Em dia', badge: 'badge-verde', dias: diffDias + 'd restantes' };
+    }
+
+    async function carregarVencimentosAdmin() {
+        db = await carregarDB();
+        const vencimentos = db.vencimentos || [];
+        const clientes = await carregarClientes();
+        const div = document.getElementById('listaVencimentosAdmin');
+        if (vencimentos.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; padding:2rem; text-align:center;">📭 Nenhum vencimento.</p>'; return; }
+        const tiposLabel = { das: 'DAS', parcelamento_das: 'Parcelamento DAS', inss: 'INSS/GPS', dctfweb: 'DCTFWeb' };
+        div.innerHTML = vencimentos.map(v => { const status = calcularStatusVencimento(v.dataVencimento); const cliente = clientes[v.clienteDoc] || { nome: 'Cliente não encontrado' }; return `<div class="vencimento-card ${status.status}"><div style="display:flex; justify-content:space-between; flex-wrap:wrap;"><div><strong>${tiposLabel[v.tipo] || v.tipo}</strong> - ${cliente.nome}<br><small>Competência: ${v.competencia} | Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small></div><div style="text-align:right;"><span class="badge ${status.badge}">${status.label} - ${status.dias}</span><br><button class="btn-excluir" onclick="removerVencimento('${v.id}')">🗑️</button></div></div></div>`; }).join('');
+    }
+
+    async function removerVencimento(id) { if (confirm('Remover?')) { db = await carregarDB(); db.vencimentos = db.vencimentos.filter(v => v.id !== id); await salvarDB(db); carregarVencimentosAdmin(); } }
+
+    async function carregarVencimentosCliente() {
+        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
+        db = await carregarDB();
+        const vencimentos = (db.vencimentos || []).filter(v => v.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('vencimentosCliente');
+        if (vencimentos.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📭 Nenhum vencimento.</p>'; return; }
+        const tiposLabel = { das: 'DAS', parcelamento_das: 'Parcelamento DAS', inss: 'INSS/GPS', dctfweb: 'DCTFWeb' };
+        div.innerHTML = vencimentos.map(v => { const status = calcularStatusVencimento(v.dataVencimento); return `<div class="vencimento-card ${status.status}"><strong>${tiposLabel[v.tipo] || v.tipo}</strong><br><small>Competência: ${v.competencia}</small><br><small>Vencimento: ${new Date(v.dataVencimento).toLocaleDateString('pt-BR')}</small><br><span class="badge ${status.badge}">${status.label} - ${status.dias}</span></div>`; }).join('');
+    }
+
+    // ============ ATIVIDADES (CORREÇÃO DEFINITIVA) ============
+    async function inicializarAtividades(clienteDoc, competencia) {
+        db = await carregarDB();
+        if (!db.atividades) db.atividades = {};
+        if (!db.atividades[clienteDoc]) db.atividades[clienteDoc] = {};
+        if (!db.atividades[clienteDoc][competencia]) {
+            db.atividades[clienteDoc][competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
+            await salvarDB(db);
+        }
+        return db.atividades[clienteDoc][competencia];
+    }
+
+    async function carregarAtividades() {
+        const doc = document.getElementById('selectClienteAtividade').value;
+        const competencia = document.getElementById('filtroCompetenciaAtividade').value;
+        const div = document.getElementById('tabelaAtividades');
+        
+        if (!doc) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p>'; return; }
+        if (!competencia) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📅 Selecione a competência.</p>'; return; }
+        
+        atividadeContexto.clienteDoc = doc;
+        atividadeContexto.competencia = competencia;
+        
+        const atividades = await inicializarAtividades(doc, competencia);
+        
+        let html = `<div style="margin-bottom:0.5rem; font-weight:600; color:#0b3b5c;">📅 Competência: <span class="competencia-badge">${competencia}</span></div><table><thead><tr><th>Atividade</th><th>Status</th><th>Data Conclusão</th><th>Observações</th><th>Ações</th></tr></thead><tbody>`;
+        
+        for (let i = 0; i < atividades.length; i++) {
+            const ativ = atividades[i];
+            const badgeClass = ativ.status === 'concluido' ? 'badge-concluido' : (ativ.status === 'andamento' ? 'badge-andamento' : 'badge-pendente');
+            const statusLabel = ativ.status === 'concluido' ? 'CONCLUÍDO' : (ativ.status === 'andamento' ? 'EM ANDAMENTO' : 'PENDENTE');
+            html += `<tr><td><strong>${ativ.nome}</strong></td><td><span class="badge ${badgeClass}">${statusLabel}</span></td><td><input type="date" id="data_${i}" value="${ativ.dataConclusao || ''}" class="input-small" style="width:140px;"></td><td><input type="text" id="obs_${i}" value="${ativ.obs || ''}" class="input-obs" placeholder="Observação..."></td><td><button type="button" class="btn-status" onclick="mudarStatusAtividade(${i},'concluido')" style="background:#27ae60; cursor:pointer;">✅</button> <button type="button" class="btn-status" onclick="mudarStatusAtividade(${i},'andamento')" style="background:#2980b9; cursor:pointer;">🔄</button> <button type="button" class="btn-status" onclick="mudarStatusAtividade(${i},'pendente')" style="background:#f39c12; cursor:pointer;">⏳</button> <button type="button" class="btn-salvar" onclick="salvarAtividade(${i})" style="cursor:pointer;">💾</button></td></tr>`;
+        }
+        
+        html += '</tbody></table>';
+        div.innerHTML = html;
+    }
+
+    async function mudarStatusAtividade(index, novoStatus) {
+        try {
+            const { clienteDoc, competencia } = atividadeContexto;
+            if (!clienteDoc || !competencia) { alert('❌ Contexto não encontrado!'); return; }
+            
+            db = await carregarDB();
+            
+            if (!db.atividades) db.atividades = {};
+            if (!db.atividades[clienteDoc]) db.atividades[clienteDoc] = {};
+            if (!db.atividades[clienteDoc][competencia]) {
+                db.atividades[clienteDoc][competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
+            }
+            
+            db.atividades[clienteDoc][competencia][index].status = novoStatus;
+            
+            if (novoStatus === 'concluido') {
+                db.atividades[clienteDoc][competencia][index].dataConclusao = new Date().toISOString().split('T')[0];
+            }
+            
+            await salvarDB(db);
+            console.log('✅ Status atualizado!');
+            await carregarAtividades();
+            
+        } catch (error) {
+            console.error('❌ Erro:', error);
+            alert('Erro: ' + error.message);
+        }
+    }
+
+    async function salvarAtividade(index) {
+        try {
+            const { clienteDoc, competencia } = atividadeContexto;
+            if (!clienteDoc || !competencia) { alert('❌ Contexto não encontrado!'); return; }
+            
+            const dataInput = document.getElementById(`data_${index}`);
+            const obsInput = document.getElementById(`obs_${index}`);
+            
+            db = await carregarDB();
+            
+            if (!db.atividades) db.atividades = {};
+            if (!db.atividades[clienteDoc]) db.atividades[clienteDoc] = {};
+            if (!db.atividades[clienteDoc][competencia]) {
+                db.atividades[clienteDoc][competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
+            }
+            
+            db.atividades[clienteDoc][competencia][index].dataConclusao = dataInput ? dataInput.value : '';
+            db.atividades[clienteDoc][competencia][index].obs = obsInput ? obsInput.value : '';
+            
+            await salvarDB(db);
+            console.log('✅ Atividade salva!');
+            alert('✅ Atividade salva!');
+            
+        } catch (error) {
+            console.error('❌ Erro:', error);
+            alert('Erro: ' + error.message);
+        }
+    }
+
+    // ============ FATOR R ============
+    async function carregarFatorR() {
+        const doc = document.getElementById('selectClienteFatorR').value;
+        const div = document.getElementById('placarFatorR');
+        if (!doc) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">Selecione um cliente.</p>'; return; }
+        const clientes = await carregarClientes();
+        const cliente = clientes[doc];
+        if (!cliente.fatorR) cliente.fatorR = { proLabore: 0, faturamento12: 0, folhaPagamento: 0 };
+        const pl = cliente.fatorR.proLabore || 0;
+        const fat12 = cliente.fatorR.faturamento12 || 0;
+        const folha = cliente.fatorR.folhaPagamento || 0;
+        const fatorR = fat12 > 0 ? ((folha / fat12) * 100) : 0;
+        let classeFator = 'fator-r-ok', textoFator = 'Anexo III ✅';
+        if (fatorR < 28) { classeFator = 'fator-r-alerta'; textoFator = 'Anexo V ⚠️'; }
+        if (fatorR < 15) { classeFator = 'fator-r-ruim'; textoFator = 'Anexo V 🔴'; }
+        div.innerHTML = `<div class="placar-grid"><div class="placar-item"><div class="label">Pró-Labore</div><div class="valor">R$ ${pl.toFixed(2)}</div></div><div class="placar-item"><div class="label">Faturamento 12m</div><div class="valor">R$ ${fat12.toFixed(2)}</div></div><div class="placar-item"><div class="label">Folha Pagamento</div><div class="valor">R$ ${folha.toFixed(2)}</div></div><div class="placar-item"><div class="label">Fator R</div><div class="valor">${fatorR.toFixed(1)}%</div><span class="fator-r-badge ${classeFator}">${textoFator}</span></div></div><div style="margin-top:1rem; display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.8rem;"><div><label>Pró-Labore</label><input type="number" id="editPL" value="${pl}" step="0.01" class="input-small"></div><div><label>Faturamento 12m</label><input type="number" id="editFat12" value="${fat12}" step="0.01" class="input-small"></div><div><label>Folha Pagamento</label><input type="number" id="editFolha" value="${folha}" step="0.01" class="input-small"></div></div><button class="btn-emitir" onclick="salvarFatorR('${doc}')" style="width:100%; margin-top:1rem;">💾 Salvar</button>`;
+    }
+
+    async function salvarFatorR(doc) {
+        const clientes = await carregarClientes();
+        clientes[doc].fatorR = { proLabore: parseFloat(document.getElementById('editPL').value) || 0, faturamento12: parseFloat(document.getElementById('editFat12').value) || 0, folhaPagamento: parseFloat(document.getElementById('editFolha').value) || 0 };
+        await salvarCliente(doc, clientes[doc]);
+        alert('✅ Fator R salvo!');
+        carregarFatorR();
+    }
+
+    // ============ NOTAS FISCAIS CLIENTE ============
+    async function carregarMinhasNFs() {
+        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
+        db = await carregarDB();
+        const minhasNFs = (db.notasFiscais || []).filter(nf => nf.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('minhasNotasFiscais');
+        if (minhasNFs.length === 0) { div.innerHTML = '<p style="color:#7f8c8d; padding:1rem;">📭 Nenhuma nota fiscal.</p>'; return; }
+        minhasNFs.sort((a, b) => b.id.localeCompare(a.id));
+        div.innerHTML = minhasNFs.map(nf => `<div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}"><h4>NF #${nf.id} - ${nf.produto}</h4><p><strong>Valor:</strong> R$ ${parseFloat(nf.valor).toFixed(2)} | ${nf.pagamento}</p><p><strong>Tomador:</strong> ${nf.tomadorNome} - ${nf.tomadorDoc}</p><p>${nf.data}</p><div style="text-align:right;"><span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span></div></div>`).join('');
+    }
+
+    async function solicitarNF(event) {
+        event.preventDefault();
+        db = await carregarDB();
+        db.notasFiscais.push({ id: 'NF' + Date.now(), clienteDoc: usuarioAtual.dados.documento, clienteNome: usuarioAtual.dados.nome || usuarioAtual.dados.empresa, valor: document.getElementById('nfValor').value, produto: document.getElementById('nfProduto').value, pagamento: document.getElementById('nfPagamento').value, tomadorNome: document.getElementById('nfNomeTomador').value, tomadorDoc: document.getElementById('nfDocTomador').value, endereco: document.getElementById('nfEndereco').value, status: 'Pendente', data: new Date().toLocaleDateString('pt-BR') });
+        await salvarDB(db);
+        alert('✅ Nota fiscal solicitada!');
+        document.getElementById('formSolicitarNF').reset();
+        carregarMinhasNFs();
+    }
+
+    // ============ PAINEL CLIENTE ============
+    async function carregarPainelCliente() {
+        if (!usuarioAtual || usuarioAtual.tipo !== 'cliente') return;
+        const clientes = await carregarClientes();
+        const c = clientes[usuarioAtual.dados.documento] || usuarioAtual.dados;
+        usuarioAtual.dados = { ...c, documento: usuarioAtual.dados.documento };
+        document.getElementById('nomeClienteHeader').textContent = c.nome || c.empresa;
+        document.getElementById('recCliente').textContent = `R$ ${(c.receitas || 0).toFixed(2)}`;
+        document.getElementById('despCliente').textContent = `R$ ${(c.despesas || 0).toFixed(2)}`;
+        document.getElementById('saldoCliente').textContent = `R$ ${((c.receitas || 0) - (c.despesas || 0)).toFixed(2)}`;
+        carregarDocumentosCliente();
+        carregarMinhasNFs();
+        carregarVencimentosCliente();
+    }
+
+    // ============ BACKUP ============
+    async function exportarBackup() {
+        const clientes = await carregarClientes();
+        const dados = { ...db, clientes };
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'backup_imperio_' + new Date().toISOString().slice(0, 10) + '.json';
+        link.click();
+    }
+
+    async function importarBackup(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!confirm('⚠️ Substituirá todos os dados. Continuar?')) return;
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                await dbRef.set({ admin: dados.admin, notasFiscais: dados.notasFiscais || [], documentos: dados.documentos || [], atividades: dados.atividades || {}, vencimentos: dados.vencimentos || [] });
+                if (dados.clientes) { for (const [doc, cliente] of Object.entries(dados.clientes)) { await salvarCliente(doc, cliente); } }
+                alert('✅ Backup restaurado!');
+                location.reload();
+            } catch (error) { alert('❌ Arquivo inválido!'); }
+        };
+        reader.readAsText(file);
+    }
+
+    // ============ INICIAR ============
+    inicializar();
+</script>
+
+</body>
+</html>
