@@ -67,26 +67,19 @@
         .badge-amarelo { background: #fef3cd; color: #856404; }
         .badge-vermelho { background: #f8d7da; color: #721c24; }
         .badge-cinza { background: #e0e0e0; color: #333; }
-        .btn-emitir, .btn-status { background: #27ae60; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; margin: 0.3rem; }
+        .btn-emitir, .btn-status { background: #27ae60; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; margin: 2px; }
         .btn-excluir { background: #e74c3c; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
-        .btn-backup { background: #f39c12; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .btn-upload { background: #3498db; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-visto { background: #27ae60; color: white; border: none; padding: 0.3rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; font-size: 0.9rem; }
         th { background: #0b1e2f; color: white; padding: 0.8rem; text-align: left; }
         td { padding: 0.8rem; border-bottom: 1px solid #ecf0f1; }
         .input-small { width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; }
-        .input-obs { width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; }
         .btn-salvar { background: #3498db; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-        .documento-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem; background: #f8f9fa; border-radius: 8px; margin: 0.5rem 0; text-decoration: none; color: #2c3e50; }
         .documento-novo { background: #fff3cd; border: 2px solid #f39c12; }
         .placar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem; }
         .placar-item { background: #f0f4f8; padding: 1rem; border-radius: 10px; text-align: center; }
         .placar-item .valor { font-size: 1.3rem; font-weight: 700; color: #0b3b5c; }
-        .fator-r-badge { display: inline-block; padding: 0.5rem 1.5rem; border-radius: 20px; font-weight: 700; }
-        .fator-r-ok { background: #d4edda; color: #155724; }
-        .fator-r-alerta { background: #fef3cd; color: #856404; }
-        .fator-r-ruim { background: #f8d7da; color: #721c24; }
         .cliente-panel { background: #f0f4f8; min-height: 100vh; }
         .cliente-header { background: #0b1e2f; color: white; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
         .cliente-tabs { display: flex; gap: 0.5rem; }
@@ -99,11 +92,8 @@
         .saldo-item .valor { font-size: 1.5rem; font-weight: 700; color: #0b3b5c; }
         .btn-solicitar { background: #0b3b5c; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 0.8rem; }
         .vencimento-card { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; border-left: 5px solid #27ae60; }
-        .vencimento-card.alerta { border-left-color: #f39c12; }
-        .vencimento-card.critico { border-left-color: #e74c3c; }
-        .vencimento-card.vencido { border-left-color: #333; }
         .doc-card { background: white; border-radius: 12px; padding: 1rem; margin-bottom: 0.8rem; }
-        textarea, select, input { width: 100%; padding: 0.7rem; border: 2px solid #e0e6ed; border-radius: 8px; margin: 0.4rem 0 0.8rem; font-size: 0.95rem; }
+        input, select { width: 100%; padding: 0.7rem; border: 2px solid #e0e6ed; border-radius: 8px; margin: 0.4rem 0; font-size: 0.95rem; }
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .info-box { background: #e8f4fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; }
         @media (max-width: 600px) { .saldo-grid, .placar-grid { grid-template-columns: 1fr; } .hero-title h2 { font-size: 2rem; } .logo-icon { width: 80px; height: 80px; } }
@@ -114,7 +104,7 @@
 <div id="loadingOverlay" class="loading-overlay">
     <div style="text-align:center;">
         <i class="fas fa-spinner fa-spin" style="font-size:3rem;"></i>
-        <p style="margin-top:1rem;">Conectando...</p>
+        <p style="margin-top:1rem;">Carregando...</p>
     </div>
 </div>
 
@@ -128,11 +118,11 @@
         <button class="btn-area-cliente" onclick="abrirLogin('cliente')"><i class="fas fa-lock"></i> Área do Cliente</button>
     </nav>
     <div class="hero">
-        <div class="hero-title"><h2>Sua contabilidade descomplicada</h2><p>Justiça tributária para pequenas e micro empresas brasileiras</p></div>
+        <div class="hero-title"><h2>Sua contabilidade descomplicada</h2><p>Justiça tributária para pequenas e micro empresas</p></div>
         <div class="mvv-grid">
             <div class="card-mvv"><h3>Missão</h3><p>Trazer justiça tributária para pequenas e micro empresas brasileiras, reduzindo seus custos com impostos e auxiliando em melhorias contra a burocracia.</p></div>
-            <div class="card-mvv"><h3>Visão</h3><p>Ser referência no atendimento prático e simples a todo tipo de empreendedor, principalmente a pequenas empresas e MEI.</p></div>
-            <div class="card-mvv"><h3>Valores</h3><p>Respeito, honra e praticidade. Acreditamos que é possível descomplicar a burocracia para que o empreendedor se preocupe somente com suas vendas.</p></div>
+            <div class="card-mvv"><h3>Visão</h3><p>Ser referência no atendimento prático e simples a todo tipo de empreendedor.</p></div>
+            <div class="card-mvv"><h3>Valores</h3><p>Respeito, honra e praticidade. Descomplicar a burocracia para o empreendedor.</p></div>
         </div>
         <div class="contact-section">
             <h3 style="color:white;">Fale Conosco</h3>
@@ -145,16 +135,16 @@
     </div>
 </div>
 
-<!-- MODAL LOGIN -->
+<!-- LOGIN -->
 <div id="loginModal" class="login-overlay hidden">
     <div class="login-box">
         <button class="close-btn" onclick="fecharLogin()">✕</button>
         <h2 id="loginTitulo">Acessar Painel</h2>
-        <p class="subtitle" id="loginSubtitulo">Digite suas credenciais</p>
+        <p class="subtitle">Digite suas credenciais</p>
         <div class="error-msg" id="loginErro"></div>
-        <form id="formLogin" onsubmit="realizarLogin(event)">
-            <div class="form-group"><label>CPF ou CNPJ</label><div class="input-wrapper"><i class="fas fa-id-card"></i><input type="text" id="inputDocumento" placeholder="Apenas números" required></div></div>
-            <div class="form-group"><label>Senha</label><div class="input-wrapper"><i class="fas fa-key"></i><input type="password" id="inputSenha" placeholder="Sua senha" required></div></div>
+        <form onsubmit="realizarLogin(event)">
+            <div class="form-group"><label>CPF/CNPJ</label><input type="text" id="inputDocumento" required></div>
+            <div class="form-group"><label>Senha</label><input type="password" id="inputSenha" required></div>
             <button type="submit" class="btn-login-submit">Entrar</button>
         </form>
     </div>
@@ -163,73 +153,46 @@
 <!-- PAINEL ADMIN -->
 <div id="painelAdmin" class="admin-panel hidden">
     <div class="admin-header">
-        <h2><i class="fas fa-crown"></i> Painel Admin</h2>
+        <h2>Painel Admin</h2>
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="alternarTabAdmin('nfs')">📋 NF</button>
             <button class="admin-tab" onclick="alternarTabAdmin('clientes')">👥 Clientes</button>
             <button class="admin-tab" onclick="alternarTabAdmin('atividades')">📝 Atividades</button>
             <button class="admin-tab" onclick="alternarTabAdmin('documentos')">📁 Docs</button>
-            <button class="admin-tab" onclick="alternarTabAdmin('gerenciarDocs')">🗂️ Gerir</button>
             <button class="admin-tab" onclick="alternarTabAdmin('agenda')">📅 Agenda</button>
             <button class="admin-tab" onclick="alternarTabAdmin('fatorR')">📊 Fator R</button>
         </div>
         <button class="btn-area-cliente" style="background:#c0392b;" onclick="logout()">Sair</button>
     </div>
     <div class="admin-content">
-        <div id="tabNFs">
-            <h3>📋 Notas Fiscais</h3>
-            <select id="filtroClienteNF" onchange="carregarTodasNFs()" style="width:auto; min-width:250px; margin-bottom:1rem;"><option value="">Todos</option></select>
-            <div id="listaNotasFiscais"></div>
-        </div>
+        <div id="tabNFs"><h3>📋 Notas Fiscais</h3><div id="listaNotasFiscais"></div></div>
         <div id="tabClientes" class="hidden">
             <h3>👥 Clientes</h3>
-            <div style="background:white; padding:1rem; border-radius:12px; margin-bottom:1rem;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-                    <input type="text" id="novoDoc" placeholder="CPF/CNPJ" class="input-small">
-                    <input type="text" id="novoNome" placeholder="Nome" class="input-small">
-                    <input type="text" id="novaSenha" placeholder="Senha" class="input-small">
-                    <input type="number" id="novaReceita" placeholder="Receitas" class="input-small">
-                    <input type="number" id="novaDespesa" placeholder="Despesas" class="input-small">
-                    <button class="btn-salvar" onclick="adicionarCliente()">✅ Cadastrar</button>
-                </div>
-            </div>
+            <input type="text" id="novoDoc" placeholder="CPF/CNPJ">
+            <input type="text" id="novoNome" placeholder="Nome">
+            <input type="text" id="novaSenha" placeholder="Senha">
+            <button class="btn-upload" onclick="adicionarCliente()">✅ Cadastrar</button>
             <div id="tabelaClientes"></div>
         </div>
         <div id="tabAtividades" class="hidden">
             <h3>📝 Atividades por Competência</h3>
-            <div style="background:white; padding:1rem; border-radius:12px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
-                    <select id="selectClienteAtividade" onchange="carregarAtividades()"><option value="">Cliente...</option></select>
-                    <input type="month" id="filtroCompetenciaAtividade" onchange="carregarAtividades()">
-                </div>
-                <div id="tabelaAtividades"></div>
-            </div>
+            <select id="selectClienteAtividade" onchange="carregarAtividades()"><option value="">Cliente...</option></select>
+            <input type="month" id="filtroCompetenciaAtividade" onchange="carregarAtividades()">
+            <div id="tabelaAtividades"></div>
         </div>
         <div id="tabDocumentos" class="hidden">
             <h3>📁 Adicionar Documento</h3>
-            <div style="background:white; padding:1rem; border-radius:12px;">
-                <div class="info-box">Suba no Google Drive → Compartilhar → "Qualquer pessoa com link" → Cole aqui</div>
-                <select id="selectClienteDoc"><option value="">Cliente...</option></select>
-                <select id="tipoDocumento"><option value="das">DAS</option><option value="inss">INSS</option><option value="dctfweb">DCTFWeb</option><option value="extrato">Extrato</option></select>
-                <input type="text" id="nomeDocumento" placeholder="Nome do documento">
-                <input type="url" id="linkDocumento" placeholder="Link do Google Drive">
-                <button class="btn-upload" onclick="adicionarDocumentoDrive()" style="width:100%;">📤 Adicionar</button>
-            </div>
-        </div>
-        <div id="tabGerenciarDocs" class="hidden">
-            <h3>🗂️ Gerenciar Documentos</h3>
-            <select id="filtroClienteDocs" onchange="carregarGerenciamentoDocs()" style="width:auto; margin-bottom:1rem;"><option value="">Todos</option></select>
-            <div id="listaGerenciarDocs"></div>
+            <select id="selectClienteDoc"><option value="">Cliente...</option></select>
+            <input type="text" id="nomeDocumento" placeholder="Nome do documento">
+            <input type="url" id="linkDocumento" placeholder="Link Google Drive">
+            <button class="btn-upload" onclick="adicionarDocumentoDrive()">📤 Adicionar</button>
         </div>
         <div id="tabAgenda" class="hidden">
-            <h3>📅 Agenda Fiscal</h3>
-            <div style="background:white; padding:1rem; border-radius:12px; margin-bottom:1rem;">
-                <select id="selectClienteVencimento"><option value="">Cliente...</option></select>
-                <select id="tipoObrigacao" onchange="atualizarInfoVencimento()"><option value="das">DAS</option><option value="parcelamento_das">Parcelamento DAS</option><option value="inss">INSS</option><option value="dctfweb">DCTFWeb</option></select>
-                <input type="month" id="competenciaObrigacao">
-                <div id="infoVencimento" style="display:none; background:#fef3cd; padding:0.5rem; border-radius:8px; font-size:0.8rem;">⚠️ Parcelamento vence no último dia do mês</div>
-                <button class="btn-upload" onclick="adicionarVencimento()" style="width:100%; margin-top:0.5rem;">➕ Adicionar</button>
-            </div>
+            <h3>📅 Agenda</h3>
+            <select id="selectClienteVencimento"><option value="">Cliente...</option></select>
+            <select id="tipoObrigacao"><option value="das">DAS</option><option value="parcelamento_das">Parcelamento DAS</option><option value="inss">INSS</option><option value="dctfweb">DCTFWeb</option></select>
+            <input type="month" id="competenciaObrigacao">
+            <button class="btn-upload" onclick="adicionarVencimento()">➕ Adicionar</button>
             <div id="listaVencimentosAdmin"></div>
         </div>
         <div id="tabFatorR" class="hidden">
@@ -243,7 +206,7 @@
 <!-- PAINEL CLIENTE -->
 <div id="painelCliente" class="cliente-panel hidden">
     <div class="cliente-header">
-        <h2><i class="fas fa-user"></i> <span id="nomeClienteHeader"></span></h2>
+        <h2><span id="nomeClienteHeader"></span></h2>
         <div class="cliente-tabs">
             <button class="cliente-tab active" onclick="alternarTabCliente('dashboard')">📊 Dashboard</button>
             <button class="cliente-tab" onclick="alternarTabCliente('notas')">📝 Notas</button>
@@ -253,22 +216,11 @@
     </div>
     <div class="cliente-content">
         <div id="tabClienteDashboard">
-            <div class="dashboard-card"><h3>📊 Dashboard</h3><div class="saldo-grid"><div class="saldo-item"><div class="rotulo">Receitas</div><div class="valor" id="recCliente">R$ 0</div></div><div class="saldo-item"><div class="rotulo">Despesas</div><div class="valor" id="despCliente">R$ 0</div></div><div class="saldo-item"><div class="rotulo">Saldo</div><div class="valor" id="saldoCliente">R$ 0</div></div></div></div>
-            <div class="dashboard-card"><h3>📁 Meus Documentos</h3><div id="documentosCliente"></div></div>
+            <div class="dashboard-card"><h3>📊 Dashboard</h3><div class="saldo-grid"><div class="saldo-item">Receitas<br><span class="valor" id="recCliente">R$ 0</span></div><div class="saldo-item">Despesas<br><span class="valor" id="despCliente">R$ 0</span></div><div class="saldo-item">Saldo<br><span class="valor" id="saldoCliente">R$ 0</span></div></div></div>
+            <div class="dashboard-card"><h3>📁 Documentos</h3><div id="documentosCliente"></div></div>
         </div>
         <div id="tabClienteNotas" class="hidden">
-            <div class="dashboard-card">
-                <h3>📝 Solicitar NF</h3>
-                <form id="formSolicitarNF" onsubmit="solicitarNF(event)">
-                    <input type="number" id="nfValor" placeholder="Valor" step="0.01" required>
-                    <input type="text" id="nfProduto" placeholder="Produto/Serviço" required>
-                    <select id="nfPagamento"><option>PIX</option><option>Boleto</option><option>Cartão</option></select>
-                    <input type="text" id="nfNomeTomador" placeholder="Nome do Tomador" required>
-                    <input type="text" id="nfDocTomador" placeholder="CPF/CNPJ Tomador" required>
-                    <input type="text" id="nfEndereco" placeholder="Endereço" required>
-                    <button type="submit" class="btn-solicitar">Solicitar NF</button>
-                </form>
-            </div>
+            <div class="dashboard-card"><h3>📝 Solicitar NF</h3><form onsubmit="solicitarNF(event)"><input type="number" id="nfValor" placeholder="Valor" required><input type="text" id="nfProduto" placeholder="Produto/Serviço" required><button type="submit" class="btn-solicitar">Solicitar</button></form></div>
             <div class="dashboard-card"><h3>📋 Minhas NFs</h3><div id="minhasNotasFiscais"></div></div>
         </div>
         <div id="tabClienteAgenda" class="hidden">
@@ -290,99 +242,125 @@
     
     firebase.initializeApp(firebaseConfig);
     const firestore = firebase.firestore();
-    
-    // IMPORTANTE: Desativar cache para garantir salvamento
-    firestore.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
 
     // ============ LOGO ============
-    document.getElementById('logoContainer').innerHTML = '<img src="https://i.ibb.co/YFgf5SbT/logo.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;">';
+    document.getElementById('logoContainer').innerHTML = '<img src="https://i.ibb.co/YFgf5SbT/logo.png" style="width:100%;height:100%;object-fit:contain;">';
 
-    const dbRef = firestore.collection('config').doc('principal');
-    const clientesRef = firestore.collection('clientes');
-
+    // ============ VARIÁVEIS ============
     let db = null;
     let usuarioAtual = null;
     let atividadeContexto = { clienteDoc: null, competencia: null };
+    const DB_KEY = 'imperio_contabil_local';
 
     const ATIVIDADES_PADRAO = [
-        { nome: 'Consulta de Débitos Anteriores', status: 'pendente', dataConclusao: '', obs: '' },
-        { nome: 'Emissão de Notas Fiscais', status: 'pendente', dataConclusao: '', obs: '' },
-        { nome: 'Transmissão DCTFWeb', status: 'pendente', dataConclusao: '', obs: '' },
-        { nome: 'Cálculo DAS', status: 'pendente', dataConclusao: '', obs: '' },
-        { nome: 'Conciliação Bancária', status: 'pendente', dataConclusao: '', obs: '' }
+        { nome: 'Consulta de Débitos Anteriores', status: 'pendente' },
+        { nome: 'Emissão de Notas Fiscais', status: 'pendente' },
+        { nome: 'Transmissão DCTFWeb', status: 'pendente' },
+        { nome: 'Cálculo DAS', status: 'pendente' },
+        { nome: 'Conciliação Bancária', status: 'pendente' }
     ];
 
     function estruturaInicial() {
-        return { admin: { documento: '43751537848', senha: 'imperio1', nome: 'Admin' }, notasFiscais: [], documentos: [], atividades: {}, vencimentos: [] };
+        return { admin: { documento: '43751537848', senha: 'imperio1' }, notasFiscais: [], documentos: [], atividades: {}, vencimentos: [] };
     }
 
+    // ============ CARREGAR DADOS ============
     async function carregarDB() {
+        // Tentar Firebase primeiro
         try {
-            const doc = await dbRef.get();
-            if (doc.exists && doc.data().admin) return doc.data();
-            const inicial = estruturaInicial();
-            await dbRef.set(inicial);
-            return inicial;
-        } catch (e) { return estruturaInicial(); }
-    }
-
-    async function salvarDB(dados) {
-        try {
-            await dbRef.set(dados, { merge: true });
-            console.log('✅ SALVO COM SUCESSO!');
-            return true;
-        } catch (e) {
-            console.error('❌ ERRO AO SALVAR:', e);
-            alert('Erro ao salvar!');
-            return false;
-        }
-    }
-
-    async function carregarClientes() {
-        try { const snap = await clientesRef.get(); const c = {}; snap.forEach(d => c[d.id] = d.data()); return c; } catch (e) { return {}; }
-    }
-
-    async function salvarCliente(doc, dados) { try { await clientesRef.doc(doc).set(dados); } catch (e) {} }
-
-    async function inicializar() {
-        try {
-            db = await carregarDB();
-            const clientes = await carregarClientes();
-            if (!clientes['61521248000192']) {
-                await salvarCliente('61521248000192', { nome: 'Woodwork', senha: 'Woodwork1', receitas: 12500, despesas: 4700, fatorR: { proLabore: 2800, faturamento12: 98000, folhaPagamento: 3500 } });
+            const docRef = firestore.collection('config').doc('principal');
+            const doc = await docRef.get();
+            if (doc.exists && doc.data().admin) {
+                return doc.data();
             }
-        } catch (e) {}
+        } catch (e) {
+            console.warn('Firebase indisponível, usando localStorage');
+        }
+        
+        // Fallback: localStorage
+        const local = localStorage.getItem(DB_KEY);
+        if (local) return JSON.parse(local);
+        
+        const inicial = estruturaInicial();
+        localStorage.setItem(DB_KEY, JSON.stringify(inicial));
+        return inicial;
+    }
+
+    // ============ SALVAR DADOS (com fallback) ============
+    async function salvarDB(dados) {
+        // SEMPRE salvar no localStorage
+        localStorage.setItem(DB_KEY, JSON.stringify(dados));
+        
+        // Tentar Firebase
+        try {
+            await firestore.collection('config').doc('principal').set(dados, { merge: true });
+            console.log('✅ Firebase salvo!');
+        } catch (e) {
+            console.warn('⚠️ Firebase falhou, usando localStorage apenas');
+        }
+        
+        console.log('✅ Dados salvos!');
+        return true;
+    }
+
+    // ============ CLIENTES ============
+    async function carregarClientes() {
+        const local = localStorage.getItem('imperio_clientes');
+        if (local) return JSON.parse(local);
+        
+        // Cliente padrão
+        const clientes = { '61521248000192': { nome: 'Woodwork', senha: 'Woodwork1', receitas: 12500, despesas: 4700 } };
+        localStorage.setItem('imperio_clientes', JSON.stringify(clientes));
+        return clientes;
+    }
+
+    async function salvarClientes(clientes) {
+        localStorage.setItem('imperio_clientes', JSON.stringify(clientes));
+    }
+
+    // ============ INICIALIZAR ============
+    async function inicializar() {
+        db = await carregarDB();
+        const clientes = await carregarClientes();
+        if (!clientes['61521248000192']) {
+            clientes['61521248000192'] = { nome: 'Woodwork', senha: 'Woodwork1', receitas: 12500, despesas: 4700 };
+            await salvarClientes(clientes);
+        }
         document.getElementById('loadingOverlay').style.display = 'none';
         mostrarTela('paginaInicial');
     }
 
+    // ============ NAVEGAÇÃO ============
     function mostrarTela(id) {
         document.querySelectorAll('#paginaInicial, #loginModal, #painelAdmin, #painelCliente').forEach(el => el.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
+    let tipoLoginAtual = 'admin';
+
     function abrirLogin(tipo) {
-        document.getElementById('formLogin').dataset.tipo = tipo;
+        tipoLoginAtual = tipo;
         document.getElementById('loginErro').style.display = 'none';
         mostrarTela('loginModal');
     }
 
     function fecharLogin() { mostrarTela('paginaInicial'); }
-    async function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
+    function logout() { usuarioAtual = null; mostrarTela('paginaInicial'); }
 
+    // ============ LOGIN ============
     async function realizarLogin(e) {
         e.preventDefault();
-        const tipo = document.getElementById('formLogin').dataset.tipo;
         const doc = document.getElementById('inputDocumento').value.replace(/\D/g, '');
         const senha = document.getElementById('inputSenha').value;
+        
         db = await carregarDB();
         const clientes = await carregarClientes();
         
-        if (tipo === 'admin' && doc === db.admin.documento && senha === db.admin.senha) {
+        if (tipoLoginAtual === 'admin' && doc === db.admin.documento && senha === db.admin.senha) {
             usuarioAtual = { tipo: 'admin' };
             await carregarPainelAdmin();
             mostrarTela('painelAdmin');
-        } else if (tipo === 'cliente' && clientes[doc] && clientes[doc].senha === senha) {
+        } else if (tipoLoginAtual === 'cliente' && clientes[doc] && clientes[doc].senha === senha) {
             usuarioAtual = { tipo: 'cliente', dados: { ...clientes[doc], documento: doc } };
             await carregarPainelCliente();
             mostrarTela('painelCliente');
@@ -392,6 +370,7 @@
         }
     }
 
+    // ============ TABS ADMIN ============
     function alternarTabAdmin(tab) {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
@@ -399,18 +378,17 @@
         document.getElementById('tabClientes').classList.toggle('hidden', tab !== 'clientes');
         document.getElementById('tabAtividades').classList.toggle('hidden', tab !== 'atividades');
         document.getElementById('tabDocumentos').classList.toggle('hidden', tab !== 'documentos');
-        document.getElementById('tabGerenciarDocs').classList.toggle('hidden', tab !== 'gerenciarDocs');
         document.getElementById('tabAgenda').classList.toggle('hidden', tab !== 'agenda');
         document.getElementById('tabFatorR').classList.toggle('hidden', tab !== 'fatorR');
         if (tab === 'clientes') carregarTabelaClientes();
         if (tab === 'atividades') carregarSelectClientes('selectClienteAtividade');
         if (tab === 'documentos') carregarSelectClientes('selectClienteDoc');
-        if (tab === 'gerenciarDocs') { carregarFiltroDocs(); carregarGerenciamentoDocs(); }
         if (tab === 'agenda') { carregarSelectClientes('selectClienteVencimento'); carregarVencimentosAdmin(); }
         if (tab === 'fatorR') carregarSelectClientes('selectClienteFatorR');
-        if (tab === 'nfs') carregarFiltroClientesNF();
+        if (tab === 'nfs') carregarTodasNFs();
     }
 
+    // ============ TABS CLIENTE ============
     function alternarTabCliente(tab) {
         document.querySelectorAll('.cliente-tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
@@ -422,14 +400,14 @@
         if (tab === 'dashboard') carregarDocumentosCliente();
     }
 
+    // ============ PAINEL ADMIN ============
     async function carregarPainelAdmin() {
         db = await carregarDB();
-        carregarFiltroClientesNF();
-        carregarSelectClientes('selectClienteDoc');
         carregarSelectClientes('selectClienteAtividade');
-        carregarSelectClientes('selectClienteFatorR');
+        carregarSelectClientes('selectClienteDoc');
         carregarSelectClientes('selectClienteVencimento');
-        carregarFiltroDocs();
+        carregarSelectClientes('selectClienteFatorR');
+        carregarTodasNFs();
     }
 
     async function carregarSelectClientes(selectId) {
@@ -437,90 +415,12 @@
         const select = document.getElementById(selectId);
         if (!select) return;
         select.innerHTML = '<option value="">Escolha...</option>';
-        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome}</option>`; });
+        Object.keys(clientes).forEach(doc => {
+            select.innerHTML += `<option value="${doc}">${clientes[doc].nome}</option>`;
+        });
     }
 
-    async function carregarFiltroClientesNF() {
-        const clientes = await carregarClientes();
-        const select = document.getElementById('filtroClienteNF');
-        select.innerHTML = '<option value="">Todos</option>';
-        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome}</option>`; });
-        carregarTodasNFs();
-    }
-
-    async function carregarTodasNFs() {
-        db = await carregarDB();
-        const nfs = db.notasFiscais || [];
-        const div = document.getElementById('listaNotasFiscais');
-        if (nfs.length === 0) { div.innerHTML = '<p>📭 Nenhuma NF</p>'; return; }
-        div.innerHTML = nfs.map(nf => `<div class="nf-card ${nf.status === 'Emitida' ? 'emitida' : ''}"><h4>${nf.produto}</h4><p>R$ ${nf.valor} | ${nf.status}</p>${nf.status === 'Pendente' ? `<button class="btn-emitir" onclick="emitirNF('${nf.id}')">✅ Emitir</button>` : ''} <button class="btn-excluir" onclick="excluirNF('${nf.id}')">🗑️</button></div>`).join('');
-    }
-
-    async function emitirNF(id) { db = await carregarDB(); const nf = db.notasFiscais.find(n => n.id === id); if (nf) { nf.status = 'Emitida'; await salvarDB(db); carregarTodasNFs(); } }
-    async function excluirNF(id) { db = await carregarDB(); db.notasFiscais = db.notasFiscais.filter(n => n.id !== id); await salvarDB(db); carregarTodasNFs(); }
-
-    async function adicionarCliente() {
-        const doc = document.getElementById('novoDoc').value.replace(/\D/g, '');
-        const nome = document.getElementById('novoNome').value;
-        const senha = document.getElementById('novaSenha').value;
-        if (!doc || !nome || !senha) return alert('Preencha!');
-        await salvarCliente(doc, { nome, senha, receitas: 0, despesas: 0, fatorR: { proLabore: 0, faturamento12: 0, folhaPagamento: 0 } });
-        alert('✅ Cadastrado!');
-        carregarTabelaClientes();
-    }
-
-    async function carregarTabelaClientes() {
-        const clientes = await carregarClientes();
-        const div = document.getElementById('tabelaClientes');
-        const docs = Object.keys(clientes);
-        if (docs.length === 0) { div.innerHTML = '<p>Nenhum cliente</p>'; return; }
-        div.innerHTML = docs.map(doc => `<div class="doc-card"><strong>${clientes[doc].nome}</strong> (${doc}) <button class="btn-excluir" onclick="removerCliente('${doc}')">🗑️</button></div>`).join('');
-    }
-
-    async function removerCliente(doc) { const clientes = await carregarClientes(); delete clientes[doc]; await clientesRef.doc(doc).delete(); carregarTabelaClientes(); }
-
-    async function adicionarDocumentoDrive() {
-        const clienteDoc = document.getElementById('selectClienteDoc').value;
-        const nome = document.getElementById('nomeDocumento').value;
-        const link = document.getElementById('linkDocumento').value;
-        if (!clienteDoc || !nome || !link) return alert('Preencha!');
-        db = await carregarDB();
-        if (!db.documentos) db.documentos = [];
-        db.documentos.push({ id: 'DOC' + Date.now(), clienteDoc, nome, link, data: new Date().toLocaleDateString(), novo: true });
-        await salvarDB(db);
-        alert('✅ Adicionado!');
-    }
-
-    async function carregarDocumentosCliente() {
-        if (!usuarioAtual) return;
-        db = await carregarDB();
-        const docs = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
-        const div = document.getElementById('documentosCliente');
-        if (docs.length === 0) { div.innerHTML = '<p>📭 Nenhum doc</p>'; return; }
-        div.innerHTML = docs.map(d => `<div class="doc-card ${d.novo ? 'documento-novo' : ''}"><a href="${d.link}" target="_blank">${d.nome}</a> ${d.novo ? '<span class="badge badge-novo">NOVO</span>' : ''} ${d.novo ? `<button class="btn-visto" onclick="clienteMarcarVisto('${d.id}')">✅ Visto</button>` : ''}</div>`).join('');
-    }
-
-    async function clienteMarcarVisto(id) { db = await carregarDB(); const d = db.documentos.find(x => x.id === id); if (d) { d.novo = false; await salvarDB(db); carregarDocumentosCliente(); } }
-
-    async function carregarFiltroDocs() {
-        const clientes = await carregarClientes();
-        const select = document.getElementById('filtroClienteDocs');
-        select.innerHTML = '<option value="">Todos</option>';
-        Object.keys(clientes).forEach(doc => { select.innerHTML += `<option value="${doc}">${clientes[doc].nome}</option>`; });
-    }
-
-    async function carregarGerenciamentoDocs() {
-        db = await carregarDB();
-        const docs = db.documentos || [];
-        const div = document.getElementById('listaGerenciarDocs');
-        if (docs.length === 0) { div.innerHTML = '<p>📭 Nenhum</p>'; return; }
-        div.innerHTML = docs.map(d => `<div class="doc-card">${d.nome} ${d.novo ? '🔴' : '✅'} <a href="${d.link}" target="_blank">Abrir</a> <button class="btn-salvar" onclick="marcarComoVisto('${d.id}')">✅</button> <button class="btn-excluir" onclick="excluirDocumento('${d.id}')">🗑️</button></div>`).join('');
-    }
-
-    async function marcarComoVisto(id) { db = await carregarDB(); const d = db.documentos.find(x => x.id === id); if (d) { d.novo = false; await salvarDB(db); carregarGerenciamentoDocs(); } }
-    async function excluirDocumento(id) { db = await carregarDB(); db.documentos = db.documentos.filter(x => x.id !== id); await salvarDB(db); carregarGerenciamentoDocs(); }
-
-    // ============ ATIVIDADES (VERSÃO FINAL FUNCIONANDO) ============
+    // ============ ATIVIDADES (FUNCIONANDO COM LOCALSTORAGE) ============
     async function carregarAtividades() {
         const doc = document.getElementById('selectClienteAtividade').value;
         const competencia = document.getElementById('filtroCompetenciaAtividade').value;
@@ -531,35 +431,31 @@
         
         atividadeContexto = { clienteDoc: doc, competencia: competencia };
         
-        // Carregar dados FRESCOS do Firebase
-        const docAtual = await dbRef.get();
-        db = docAtual.exists ? docAtual.data() : estruturaInicial();
+        db = await carregarDB();
         
         if (!db.atividades) db.atividades = {};
         if (!db.atividades[doc]) db.atividades[doc] = {};
         if (!db.atividades[doc][competencia]) {
             db.atividades[doc][competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
-            await dbRef.set(db, { merge: true });
-            db = (await dbRef.get()).data();
+            await salvarDB(db);
+            db = await carregarDB();
         }
         
         const atividades = db.atividades[doc][competencia];
         
-        let html = `<p style="font-weight:600; margin-bottom:0.5rem;">Competência: ${competencia}</p>`;
-        html += '<table style="width:100%;"><thead><tr><th>Atividade</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+        let html = `<p style="font-weight:600;">Competência: ${competencia}</p><table><thead><tr><th>Atividade</th><th>Status</th><th>Ações</th></tr></thead><tbody>`;
         
         for (let i = 0; i < atividades.length; i++) {
             const ativ = atividades[i];
             const badgeClass = ativ.status === 'concluido' ? 'badge-concluido' : (ativ.status === 'andamento' ? 'badge-andamento' : 'badge-pendente');
-            const statusLabel = ativ.status.toUpperCase();
             
             html += `<tr>
                 <td>${ativ.nome}</td>
-                <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+                <td><span class="badge ${badgeClass}">${ativ.status.toUpperCase()}</span></td>
                 <td>
-                    <button type="button" onclick="mudarStatusAtividade(${i},'concluido')" style="background:#27ae60;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin:2px;">✅</button>
-                    <button type="button" onclick="mudarStatusAtividade(${i},'andamento')" style="background:#2980b9;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin:2px;">🔄</button>
-                    <button type="button" onclick="mudarStatusAtividade(${i},'pendente')" style="background:#f39c12;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;margin:2px;">⏳</button>
+                    <button type="button" onclick="mudarStatusAtividade(${i},'concluido')" style="background:#27ae60;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">✅</button>
+                    <button type="button" onclick="mudarStatusAtividade(${i},'andamento')" style="background:#2980b9;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">🔄</button>
+                    <button type="button" onclick="mudarStatusAtividade(${i},'pendente')" style="background:#f39c12;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">⏳</button>
                 </td>
             </tr>`;
         }
@@ -569,83 +465,116 @@
     }
 
     async function mudarStatusAtividade(index, status) {
-        console.log('🔄 MUDANDO STATUS:', { index, status, contexto: atividadeContexto });
+        console.log('🔄 Mudando status...', { index, status });
         
         if (!atividadeContexto.clienteDoc || !atividadeContexto.competencia) {
-            alert('❌ Selecione cliente e competência primeiro!');
+            alert('Selecione cliente e competência!');
             return;
         }
         
-        try {
-            // Pegar dados MAIS ATUAIS do Firebase
-            const docAtual = await dbRef.get();
-            const dadosAtuais = docAtual.exists ? docAtual.data() : estruturaInicial();
-            
-            // Garantir estrutura
-            if (!dadosAtuais.atividades) dadosAtuais.atividades = {};
-            if (!dadosAtuais.atividades[atividadeContexto.clienteDoc]) dadosAtuais.atividades[atividadeContexto.clienteDoc] = {};
-            if (!dadosAtuais.atividades[atividadeContexto.clienteDoc][atividadeContexto.competencia]) {
-                dadosAtuais.atividades[atividadeContexto.clienteDoc][atividadeContexto.competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
-            }
-            
-            // ATUALIZAR STATUS
-            dadosAtuais.atividades[atividadeContexto.clienteDoc][atividadeContexto.competencia][index].status = status;
-            
-            if (status === 'concluido') {
-                dadosAtuais.atividades[atividadeContexto.clienteDoc][atividadeContexto.competencia][index].dataConclusao = new Date().toISOString().split('T')[0];
-            }
-            
-            // SALVAR DIRETO
-            await dbRef.set(dadosAtuais, { merge: true });
-            
-            console.log('✅ STATUS SALVO NO FIREBASE!');
-            
-            // Atualizar variável global
-            db = dadosAtuais;
-            
-            // Recarregar tabela
-            await carregarAtividades();
-            
-        } catch (error) {
-            console.error('❌ ERRO:', error);
-            alert('Erro: ' + error.message);
+        // Carregar dados MAIS RECENTES
+        db = await carregarDB();
+        
+        const { clienteDoc, competencia } = atividadeContexto;
+        
+        // Garantir estrutura
+        if (!db.atividades) db.atividades = {};
+        if (!db.atividades[clienteDoc]) db.atividades[clienteDoc] = {};
+        if (!db.atividades[clienteDoc][competencia]) {
+            db.atividades[clienteDoc][competencia] = JSON.parse(JSON.stringify(ATIVIDADES_PADRAO));
         }
+        
+        // ATUALIZAR
+        db.atividades[clienteDoc][competencia][index].status = status;
+        
+        // SALVAR
+        await salvarDB(db);
+        
+        console.log('✅ Status salvo:', db.atividades[clienteDoc][competencia][index]);
+        
+        // Recarregar tabela
+        await carregarAtividades();
+    }
+
+    // ============ NFs ============
+    async function carregarTodasNFs() {
+        db = await carregarDB();
+        const nfs = db.notasFiscais || [];
+        const div = document.getElementById('listaNotasFiscais');
+        if (nfs.length === 0) { div.innerHTML = '<p>📭 Nenhuma NF</p>'; return; }
+        div.innerHTML = nfs.map(nf => `<div class="nf-card"><strong>${nf.produto}</strong> - R$ ${nf.valor} <span class="badge ${nf.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${nf.status}</span></div>`).join('');
+    }
+
+    async function solicitarNF(e) {
+        e.preventDefault();
+        db = await carregarDB();
+        db.notasFiscais.push({ id: 'NF' + Date.now(), clienteDoc: usuarioAtual.dados.documento, produto: document.getElementById('nfProduto').value, valor: document.getElementById('nfValor').value, status: 'Pendente' });
+        await salvarDB(db);
+        alert('✅ Solicitada!');
+        document.getElementById('formSolicitarNF').reset();
+        carregarMinhasNFs();
+    }
+
+    async function carregarMinhasNFs() {
+        if (!usuarioAtual) return;
+        db = await carregarDB();
+        const nfs = (db.notasFiscais || []).filter(n => n.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('minhasNotasFiscais');
+        if (nfs.length === 0) { div.innerHTML = '<p>📭 Nenhuma</p>'; return; }
+        div.innerHTML = nfs.map(n => `<div class="nf-card">${n.produto} - R$ ${n.valor} - ${n.status}</div>`).join('');
+    }
+
+    // ============ CLIENTES ============
+    async function adicionarCliente() {
+        const doc = document.getElementById('novoDoc').value.replace(/\D/g, '');
+        const nome = document.getElementById('novoNome').value;
+        const senha = document.getElementById('novaSenha').value;
+        if (!doc || !nome || !senha) return alert('Preencha!');
+        const clientes = await carregarClientes();
+        clientes[doc] = { nome, senha, receitas: 0, despesas: 0 };
+        await salvarClientes(clientes);
+        alert('✅ Cadastrado!');
+        carregarTabelaClientes();
+    }
+
+    async function carregarTabelaClientes() {
+        const clientes = await carregarClientes();
+        const div = document.getElementById('tabelaClientes');
+        div.innerHTML = Object.keys(clientes).map(doc => `<div class="doc-card">${clientes[doc].nome} (${doc})</div>`).join('');
+    }
+
+    // ============ DOCUMENTOS ============
+    async function adicionarDocumentoDrive() {
+        const clienteDoc = document.getElementById('selectClienteDoc').value;
+        const nome = document.getElementById('nomeDocumento').value;
+        const link = document.getElementById('linkDocumento').value;
+        if (!clienteDoc || !nome || !link) return alert('Preencha!');
+        db = await carregarDB();
+        db.documentos.push({ id: 'DOC' + Date.now(), clienteDoc, nome, link, novo: true });
+        await salvarDB(db);
+        alert('✅ Adicionado!');
+    }
+
+    async function carregarDocumentosCliente() {
+        if (!usuarioAtual) return;
+        db = await carregarDB();
+        const docs = (db.documentos || []).filter(d => d.clienteDoc === usuarioAtual.dados.documento);
+        const div = document.getElementById('documentosCliente');
+        if (docs.length === 0) { div.innerHTML = '<p>📭 Nenhum</p>'; return; }
+        div.innerHTML = docs.map(d => `<div class="doc-card"><a href="${d.link}" target="_blank">${d.nome}</a></div>`).join('');
     }
 
     // ============ VENCIMENTOS ============
-    function atualizarInfoVencimento() {
-        document.getElementById('infoVencimento').style.display = document.getElementById('tipoObrigacao').value === 'parcelamento_das' ? 'block' : 'none';
-    }
-
     async function adicionarVencimento() {
         const clienteDoc = document.getElementById('selectClienteVencimento').value;
         const tipo = document.getElementById('tipoObrigacao').value;
         const competencia = document.getElementById('competenciaObrigacao').value;
         if (!clienteDoc || !competencia) return alert('Preencha!');
-        const [ano, mes] = competencia.split('-');
-        let dataVenc;
-        if (tipo === 'parcelamento_das') {
-            const ultimo = new Date(parseInt(ano), parseInt(mes), 0).getDate();
-            dataVenc = new Date(parseInt(ano), parseInt(mes) - 1, ultimo);
-        } else {
-            dataVenc = new Date(parseInt(ano), parseInt(mes), 20);
-        }
         db = await carregarDB();
-        if (!db.vencimentos) db.vencimentos = [];
-        db.vencimentos.push({ id: 'V' + Date.now(), clienteDoc, tipo, competencia, dataVencimento: dataVenc.toISOString() });
+        db.vencimentos.push({ id: 'V' + Date.now(), clienteDoc, tipo, competencia });
         await salvarDB(db);
         alert('✅ Adicionado!');
         carregarVencimentosAdmin();
-    }
-
-    function calcularStatus(data) {
-        const hoje = new Date(); const venc = new Date(data);
-        hoje.setHours(0,0,0,0); venc.setHours(0,0,0,0);
-        const dias = Math.ceil((venc - hoje) / 86400000);
-        if (dias < 0) return { status: 'vencido', label: 'Vencido', badge: 'badge-cinza' };
-        if (dias <= 2) return { status: 'critico', label: 'Crítico', badge: 'badge-vermelho' };
-        if (dias <= 5) return { status: 'alerta', label: 'Alerta', badge: 'badge-amarelo' };
-        return { status: 'ok', label: 'Em dia', badge: 'badge-verde' };
     }
 
     async function carregarVencimentosAdmin() {
@@ -653,10 +582,8 @@
         const vencs = db.vencimentos || [];
         const div = document.getElementById('listaVencimentosAdmin');
         if (vencs.length === 0) { div.innerHTML = '<p>📭 Nenhum</p>'; return; }
-        div.innerHTML = vencs.map(v => { const s = calcularStatus(v.dataVencimento); return `<div class="vencimento-card ${s.status}"><strong>${v.tipo}</strong> - ${v.competencia}<br><span class="badge ${s.badge}">${s.label}</span> <button class="btn-excluir" onclick="removerVencimento('${v.id}')">🗑️</button></div>`; }).join('');
+        div.innerHTML = vencs.map(v => `<div class="vencimento-card">${v.tipo} - ${v.competencia}</div>`).join('');
     }
-
-    async function removerVencimento(id) { db = await carregarDB(); db.vencimentos = db.vencimentos.filter(v => v.id !== id); await salvarDB(db); carregarVencimentosAdmin(); }
 
     async function carregarVencimentosCliente() {
         if (!usuarioAtual) return;
@@ -664,7 +591,7 @@
         const vencs = (db.vencimentos || []).filter(v => v.clienteDoc === usuarioAtual.dados.documento);
         const div = document.getElementById('vencimentosCliente');
         if (vencs.length === 0) { div.innerHTML = '<p>📭 Nenhum</p>'; return; }
-        div.innerHTML = vencs.map(v => { const s = calcularStatus(v.dataVencimento); return `<div class="vencimento-card ${s.status}"><strong>${v.tipo}</strong> - ${v.competencia}<br><span class="badge ${s.badge}">${s.label}</span></div>`; }).join('');
+        div.innerHTML = vencs.map(v => `<div class="vencimento-card">${v.tipo} - ${v.competencia}</div>`).join('');
     }
 
     // ============ FATOR R ============
@@ -673,36 +600,8 @@
         if (!doc) return;
         const clientes = await carregarClientes();
         const c = clientes[doc];
-        if (!c.fatorR) c.fatorR = { proLabore: 0, faturamento12: 0, folhaPagamento: 0 };
         const div = document.getElementById('placarFatorR');
-        div.innerHTML = `<div class="placar-grid"><div class="placar-item"><div class="label">Pró-Labore</div><div class="valor">R$ ${c.fatorR.proLabore}</div></div><div class="placar-item"><div class="label">Faturamento 12m</div><div class="valor">R$ ${c.fatorR.faturamento12}</div></div><div class="placar-item"><div class="label">Folha</div><div class="valor">R$ ${c.fatorR.folhaPagamento}</div></div></div><input type="number" id="editPL" value="${c.fatorR.proLabore}" placeholder="Pró-Labore"><input type="number" id="editFat12" value="${c.fatorR.faturamento12}" placeholder="Faturamento 12m"><input type="number" id="editFolha" value="${c.fatorR.folhaPagamento}" placeholder="Folha"><button class="btn-upload" onclick="salvarFatorR('${doc}')" style="width:100%;">💾 Salvar</button>`;
-    }
-
-    async function salvarFatorR(doc) {
-        const clientes = await carregarClientes();
-        clientes[doc].fatorR = { proLabore: parseFloat(document.getElementById('editPL').value) || 0, faturamento12: parseFloat(document.getElementById('editFat12').value) || 0, folhaPagamento: parseFloat(document.getElementById('editFolha').value) || 0 };
-        await salvarCliente(doc, clientes[doc]);
-        alert('✅ Salvo!');
-    }
-
-    // ============ NFs CLIENTE ============
-    async function carregarMinhasNFs() {
-        if (!usuarioAtual) return;
-        db = await carregarDB();
-        const nfs = (db.notasFiscais || []).filter(n => n.clienteDoc === usuarioAtual.dados.documento);
-        const div = document.getElementById('minhasNotasFiscais');
-        if (nfs.length === 0) { div.innerHTML = '<p>📭 Nenhuma</p>'; return; }
-        div.innerHTML = nfs.map(n => `<div class="nf-card ${n.status === 'Emitida' ? 'emitida' : ''}"><strong>${n.produto}</strong> - R$ ${n.valor}<br><span class="badge ${n.status === 'Emitida' ? 'badge-emitida' : 'badge-pendente'}">${n.status}</span></div>`).join('');
-    }
-
-    async function solicitarNF(e) {
-        e.preventDefault();
-        db = await carregarDB();
-        db.notasFiscais.push({ id: 'NF' + Date.now(), clienteDoc: usuarioAtual.dados.documento, produto: document.getElementById('nfProduto').value, valor: document.getElementById('nfValor').value, status: 'Pendente', data: new Date().toLocaleDateString() });
-        await salvarDB(db);
-        alert('✅ Solicitada!');
-        document.getElementById('formSolicitarNF').reset();
-        carregarMinhasNFs();
+        div.innerHTML = `<div class="placar-grid"><div class="placar-item">Pró-Labore<br><span class="valor">R$ ${c.fatorR?.proLabore || 0}</span></div><div class="placar-item">Fat 12m<br><span class="valor">R$ ${c.fatorR?.faturamento12 || 0}</span></div><div class="placar-item">Folha<br><span class="valor">R$ ${c.fatorR?.folhaPagamento || 0}</span></div></div>`;
     }
 
     // ============ PAINEL CLIENTE ============
@@ -718,7 +617,7 @@
         carregarVencimentosCliente();
     }
 
-    // Iniciar
+    // ============ INICIAR ============
     inicializar();
 </script>
 
